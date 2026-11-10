@@ -156,7 +156,7 @@ html.js .tok.in { opacity: 1; }
 /* Each word rises into place and arrives warm, like wet ink catching the last light, then cools to the page colour */
 html.js .tok.w { display: inline-block; transform: translateY(7px); transition: opacity .5s ease, transform .6s cubic-bezier(.2, .8, .2, 1); }
 html.js .tok.w.in { transform: none; animation: ink 1.5s ease-out 1; }
-@keyframes ink { 0% { color: #ffe0ae; text-shadow: 0 0 16px rgba(255, 196, 120, .95), 0 0 3px rgba(255, 220, 170, .9); } 100% { color: inherit; } }
+@keyframes ink { 0% { color: #ffe9c8; text-shadow: 0 0 10px rgba(255, 206, 150, .55); } 100% { color: inherit; } }
 html.js a.tok.in, html.js .nw.tok.in a { animation: ink-link 1.6s ease-out 1; }
 @keyframes ink-link { 0% { text-shadow: 0 0 18px rgba(255, 196, 120, 1); text-decoration-color: var(--gold); } }
 html.js .ico.tok, html.js .nw.tok .ico { transform: scale(.2) rotate(-25deg); transition: opacity .3s ease, transform .55s cubic-bezier(.3, 1.8, .5, 1); }
