@@ -3,7 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Christian Koregelos</title>
+<title>Christian Koregelos · Statistics student seeking an actuarial internship</title>
+<meta name="theme-color" content="#0b0a1e">
+<link rel="canonical" href="https://koregelos.github.io/">
+<meta property="og:url" content="https://koregelos.github.io/">
+<meta name="twitter:card" content="summary">
 <meta name="description" content="Christian Koregelos is a statistics undergraduate at Sacramento State preparing for SOA Exam P and seeking an actuarial internship.">
 <meta property="og:title" content="Christian Koregelos">
 <meta property="og:description" content="Statistics undergraduate at Sacramento State. Probability, regression, Monte Carlo simulation, Python and SQL. Seeking an actuarial internship.">
@@ -11,19 +15,24 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%23ffc078'/%3E%3Cg fill='%231a1740'%3E%3Ccircle cx='20' cy='20' r='6'/%3E%3Ccircle cx='44' cy='20' r='6'/%3E%3Ccircle cx='32' cy='32' r='6'/%3E%3Ccircle cx='20' cy='44' r='6'/%3E%3Ccircle cx='44' cy='44' r='6'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Covered+By+Your+Grace&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Mr+Dafoe&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <style>html{background:#0b0a1e}html.pre:not(.ready) body{visibility:hidden;animation:pre-show 0s linear 4s forwards}html.intro:not(.ready) body{visibility:hidden;animation:none}@keyframes pre-show{to{visibility:visible}}</style>
-<script>(function(){var r=document.documentElement;r.classList.add('js','intro');try{history.scrollRestoration='manual'}catch(e){}setTimeout(function(){if(!r.classList.contains('ready')){r.classList.remove('intro');r.classList.add('ready','lit')}},6000)})();</script>
+<script>(function(){var r=document.documentElement,f=document.createElement('link');f.rel='stylesheet';f.href='https://fonts.googleapis.com/css2?family=Covered+By+Your+Grace&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Mr+Dafoe&family=Playfair+Display:wght@500;600&display=swap';document.head.appendChild(f);window.__noScript=function(){r.classList.remove('intro','js');r.classList.add('ready','lit','nojs')};r.classList.add('js','intro');try{history.scrollRestoration='manual'}catch(e){}setTimeout(function(){if(!r.classList.contains('ready')){r.classList.remove('intro','js');r.classList.add('ready','lit','nojs')}},3500)})();</script>
+<noscript><link href="https://fonts.googleapis.com/css2?family=Covered+By+Your+Grace&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Mr+Dafoe&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet"><style>html.pre body{visibility:visible!important;animation:none!important}.rail,#trading .card,#curve,.clock,.pill,.scene,.cue{display:none!important}.nav::before,.nav::after{opacity:1!important}</style></noscript>
 </head>
 <body>
+<a class="skip-link" href="#top">Skip to content</a>
+<div class="pill" id="pill" hidden>
+  <button type="button" id="ff" aria-pressed="false"><svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path d="M3 5l8 7-8 7zM13 5l8 7-8 7z" fill="currentColor"/></svg>Fast forward</button>
+  <button type="button" id="skip">Skip</button>
+</div>
 <div class="scene" aria-hidden="true">
   <div class="sky sky-dusk"></div>
   <div class="sky sky-night"></div>
   <div class="sun"></div>
   <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div><div class="cloud c4"></div><div class="cloud c5"></div>
   <svg id="land" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice"></svg>
-  <div class="birds"><svg viewBox="0 0 120 40"><g fill="none" stroke="#2a1c3f" stroke-width="1.6" stroke-linecap="round"><path d="M4 20 q5-7 10 0 q5-7 10 0"/><path d="M34 9 q4-6 8 0 q4-6 8 0"/><path d="M40 30 q4-5 8 0 q4-5 8 0"/><path d="M70 17 q3.5-5 7 0 q3.5-5 7 0"/><path d="M92 28 q3-4 6 0 q3-4 6 0"/></g></svg></div>
+  <div class="birds"><svg viewBox="0 0 120 40"><g fill="none" stroke="#f3c9b0" stroke-opacity=".7" stroke-width="1.6" stroke-linecap="round"><path d="M4 20 q5-7 10 0 q5-7 10 0"/><path d="M34 9 q4-6 8 0 q4-6 8 0"/><path d="M40 30 q4-5 8 0 q4-5 8 0"/><path d="M70 17 q3.5-5 7 0 q3.5-5 7 0"/><path d="M92 28 q3-4 6 0 q3-4 6 0"/></g></svg></div>
   <div class="nightwash"></div>
   <div class="aurora"><i></i><i></i><i></i></div>
   <div class="milky"></div>
@@ -51,29 +60,29 @@
       <a href="#education">Education</a>
       <a href="#contact">Contact</a>
     </nav>
-    <span class="clock" id="clock" title="Scroll to move the evening along">6:30 pm</span>
+    <span class="clock" id="clock" aria-hidden="true">6:30 pm</span>
   </div>
 </header>
 
-<nav class="rail" id="rail" aria-label="Page sections">
+<nav class="rail" id="rail" aria-hidden="true">
   <i class="rail-line"></i><b class="rail-dot" id="rail-dot"></b>
-  <a href="#story">Story</a><a href="#projects">Projects</a><a href="#experience">Experience</a><a href="#education">Education</a><a href="#skills">Skills</a><a href="#curve">Curve</a><a href="#contact">Contact</a>
+  <a tabindex="-1" href="#story">Story</a><a tabindex="-1" href="#projects">Projects</a><a tabindex="-1" href="#experience">Experience</a><a tabindex="-1" href="#education">Education</a><a tabindex="-1" href="#skills">Skills</a><a tabindex="-1" href="#curve">Bell curve</a><a tabindex="-1" href="#contact">Contact</a>
 </nav>
 
-<main class="col" id="top">
+<main class="col" id="top" tabindex="-1">
 
 <section class="hero" id="story">
   <h1 class="sig" aria-label="Christian Koregelos"><span aria-hidden="true">christian koregelos</span></h1>
-  <p class="hello" data-type>hey, glad you're here <span class="wave">👋</span></p>
+  <p class="hello" data-type>hey, glad you're here <span class="wave" aria-hidden="true">👋</span></p>
 
   <div class="story">
-    <p data-type>I've been <span class="ico i-chart"></span><a href="#projects">building things</a> with numbers since 2023, starting with <span class="badge">a resale business</span> I founded on $3,000 of starting capital. I automated it in <span class="ico i-py">Py</span>Python, completed more than 1,000 transactions, and earned <a class="soft" href="#business">roughly $20,000 in profit</a>.</p>
+    <p data-type>I study <span class="nw"><span class="ico i-cap"></span><a href="#education">Statistics at Sacramento State</a></span> on an accelerated three-year path, with a <span class="serif">3.783 GPA</span>. I'm preparing for <span class="nw"><span class="ico i-sigma">P</span><a href="#education">SOA Exam P</a></span> in summer 2027, and I'm looking for an <span class="hl">actuarial internship</span>.</p>
 
-    <p data-type>Along the way I spent two years at <a href="#education">The Real World Investing Campus</a> and graduated in its <span class="hl">highest completion tier</span> by passing a live oral assessment and building six profitable investment systems. Since 2023 I've also built and backtested <span class="script">over 100 investment strategies,</span> and I test how robust they are with <span class="ico i-die"></span><a href="#projects">Monte Carlo simulation</a>.</p>
+    <p data-type>I've been <span class="nw"><span class="ico i-chart"></span><a href="#projects">building things</a></span> with numbers since 2023, beginning with <span class="badge">a resale business</span> I founded on $3,000 of starting capital. I automated it in <span class="nw"><span class="ico i-py">Py</span>Python,</span> completed more than 1,000 transactions, and earned <a class="soft" href="#business">roughly $20,000 in profit</a>.</p>
 
-    <p data-type>Today I study <span class="ico i-cap"></span><a href="#education">Statistics at Sacramento State</a> on an accelerated three-year path, with a <span class="serif">3.783 GPA</span>. I'm preparing for <span class="ico i-sigma">P</span><a href="#education">SOA Exam P</a> in Summer 2027, and I'm looking for an actuarial internship.</p>
+    <p data-type>Along the way I spent two years at <a href="#education">The Real World Investing Campus</a> and graduated in its highest completion tier by passing a live oral assessment and building six profitable investment systems. Since 2023 I've also built and backtested <span class="script">over 100 investment strategies</span>, and I test how robust they are with <span class="nw"><span class="ico i-die"></span><a href="#projects">Monte Carlo simulation</a></span>.</p>
 
-    <p data-type>On the side I'm fine-tuning a language model for <span class="ico i-quill"></span><a href="#quillton">Quillton</a>.</p>
+    <p data-type>On the side I'm fine-tuning a language model for <span class="nw"><span class="ico i-quill"></span><a href="#quillton">Quillton</a></span>.</p>
 
     <p data-type>Here's some of what I've made.</p>
   </div>
@@ -81,12 +90,14 @@
 
 <div class="after">
 
-<div class="figures reveal" aria-label="Key figures">
-  <div><b data-to="3.783" data-dec="3">3.783</b><span>GPA, B.S. Statistics</span></div>
+<div class="figures reveal" role="group" aria-label="Key figures">
+  <div><b>3.783</b><span>GPA, B.S. Statistics</span></div>
   <div><b data-to="100" data-suf="+">100+</b><span>strategies built and backtested</span></div>
   <div><b data-to="1000" data-suf="+">1,000+</b><span>transactions completed</span></div>
   <div><b data-to="100" data-pre="$" data-suf="K+">$100K+</b><span>total business revenue</span></div>
 </div>
+
+<p class="cue" aria-hidden="true">Scroll, and watch the sun go down <span>&darr;</span></p>
 
 <section class="block" id="projects">
   <div class="block-head"><h2>Projects</h2><span class="aside">3 so far, more on the way</span></div>
@@ -95,8 +106,10 @@
     <article class="card-wrap reveal" id="trading">
       <div class="card c-blue">
         <div class="shot shot-sim">
-          <span class="shot-tag">Monte Carlo &middot; illustration, not real results &middot; click to rerun</span>
+          <span class="shot-tag">Monte Carlo &middot; illustration, not real results</span>
+          <button class="rerun" type="button" id="rerun">Rerun</button>
           <canvas id="sim" role="img" aria-label="Fan of simulated random-walk paths with a median line"></canvas>
+          <p class="legend"><span><i class="l-path"></i>160 simulated paths</span><span><i class="l-band"></i>5th to 95th percentile</span><span><i class="l-med"></i>median</span></p>
         </div>
       </div>
       <div class="cap"><h3>Trading Strategy Research</h3><span>2023 &ndash; Present</span></div>
@@ -119,7 +132,7 @@
     <article class="card-wrap reveal" id="business">
       <div class="card c-amber">
         <div class="shot shot-ledger">
-          <span class="shot-tag">Christian Anthony Investments LLC &middot; Jan 2023 &ndash; Dec 2024</span>
+          <span class="shot-tag"><span class="nw">Christian Anthony Investments LLC</span> <span class="nw">Jan 2023 &ndash; Dec 2024</span></span>
           <div class="growth" aria-hidden="true"><span class="g1"></span><span class="g2"></span><em>$3,000 in</em><em>~$20,000 profit</em></div>
           <dl>
             <div><dt>Starting capital</dt><dd>$3,000</dd></div>
@@ -129,14 +142,14 @@
           </dl>
         </div>
       </div>
-      <div class="cap"><h3>Christian Anthony Investments LLC</h3><span>2023 &ndash; 2024</span></div>
+      <div class="cap"><h3>Christian Anthony Investments LLC</h3><span>Jan 2023 &ndash; Dec 2024</span></div>
       <p class="desc">A resale business I founded and funded with cryptocurrency. I automated cryptocurrency gift card arbitrage in Python and analyzed fees, margins, and profitability to guide business decisions.</p>
     </article>
 
     <!-- PLACEHOLDERS: when a new project is ready, copy one of the cards above into this spot. -->
     <div class="ghosts reveal">
-      <div class="card ghost"><div class="ghost-in"><i>+</i><b>Next project</b><span>Placeholder for a screenshot, title, and link</span></div></div>
-      <div class="card ghost"><div class="ghost-in"><i>+</i><b>Next project</b><span>Placeholder for a screenshot, title, and link</span></div></div>
+      <div class="card ghost"><div class="ghost-in"><i>+</i><b>Next project</b><span>In progress</span></div></div>
+      <div class="card ghost"><div class="ghost-in"><i>+</i><b>Next project</b><span>In progress</span></div></div>
     </div>
   </div>
 </section>
@@ -176,12 +189,12 @@
   <div class="block-head"><h2>Education and exams</h2></div>
   <div class="rows">
     <article class="row reveal">
-      <div class="cap"><h3>California State University, Sacramento</h3><span>May 2028</span></div>
+      <div class="cap"><h3>California State University, Sacramento</h3><span>Expected May 2028</span></div>
       <p class="role">Bachelor of Science, Statistics &middot; GPA 3.783</p>
       <ul><li>Second-year student on an accelerated three-year graduation path.</li></ul>
     </article>
     <article class="row reveal">
-      <div class="cap"><h3>Society of Actuaries Exam P</h3><span>Testing Summer 2027</span></div>
+      <div class="cap"><h3>Society of Actuaries Exam P</h3><span>Testing summer 2027</span></div>
       <p class="role">Probability &middot; in preparation</p>
     </article>
     <article class="row reveal">
@@ -209,12 +222,13 @@
 <section class="contact reveal" id="contact">
   <p class="script">let's talk</p>
   <h2>I'm looking for an actuarial internship.</h2>
-  <p>I'm preparing for SOA Exam P in Summer 2027 and graduate in May 2028. If you have a role where careful analysis matters, I'd be glad to hear from you.</p>
+  <p>I'm preparing for SOA Exam P in summer 2027 and graduate in May 2028. If you have a role where careful analysis matters, I'd be glad to hear from you.</p>
   <div class="contact-row">
     <a class="btn primary" href="mailto:chkoregelos@gmail.com">Email me</a>
-    <button class="btn" type="button" id="copy" data-text="chkoregelos@gmail.com">Copy email</button>
-    <a class="btn" href="https://www.linkedin.com/in/christian-koregelos" target="_blank" rel="noopener">LinkedIn</a>
+    <button class="btn" type="button" id="copy" data-text="chkoregelos@gmail.com" aria-live="polite">Copy email</button>
+    <a class="btn" href="https://www.linkedin.com/in/christian-koregelos" target="_blank" rel="noopener" aria-label="LinkedIn (opens in a new tab)">LinkedIn</a>
   </div>
+  <p class="addr">chkoregelos@gmail.com</p>
 </section>
 
 <footer class="foot">
@@ -231,13 +245,10 @@
 
 <div class="after tail" aria-hidden="true"></div>
 
-<p class="hint" id="hint" hidden>Scroll, and watch the sun go down <span>&darr;</span></p>
 
-<div class="pill" id="pill" hidden>
-  <button type="button" id="ff"><svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path d="M3 5l8 7-8 7zM13 5l8 7-8 7z" fill="currentColor"/></svg>Fast forward</button>
-  <button type="button" id="skip">Skip</button>
-</div>
 
-<script src="script.js"></script>
+
+
+<script src="script.js" onerror="__noScript()"></script>
 </body>
 </html>

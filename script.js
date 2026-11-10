@@ -39,7 +39,7 @@
       var body = '<path fill="url(#lg' + i + ')" d="M' + pts.join(' L') + ' L1720 960 L-120 960 Z"/>';
       if (i < 4) body += '<path fill="none" stroke="#ffe6cc" stroke-opacity="' + (.5 - i * .1) + '" stroke-width="1.4" d="M' + pts.join(' L') + '"/>';
       // a pin flag on a far green: a small nod to the golf course
-      if (i === 2) { var fx = 1010, fy = Y(fx); body += '<path d="M' + fx + ' ' + fy + ' v-26" stroke="#f6e9dc" stroke-width="1.4"/><path d="M' + fx + ' ' + (fy - 26) + ' l13 4.5 -13 4.5z" fill="#ff8b6b"/>'; }
+      if (i === 2) { var fx = 1292, fy = Y(fx); body += '<path d="M' + fx + ' ' + fy + ' v-26" stroke="#f6e9dc" stroke-width="1.4"/><path d="M' + fx + ' ' + (fy - 26) + ' l13 4.5 -13 4.5z" fill="#ff8b6b"/>'; }
       for (var k = 0; k < d.pines; k++) {
         var px = i === 5 ? (r() < .5 ? -60 + r() * 380 : 1280 + r() * 380) : -100 + r() * 1800;
         var h = d.size * (.7 + r() * .7), w = h * .3, py = Y(px) + 3, tree = '';
@@ -100,14 +100,14 @@
     document.getElementById('flies').innerHTML = f;
   })();
 
-  /* Scroll sets the time of day; the pointer and scroll shift the ridges for depth */
-  var ticking = false, clock = document.getElementById('clock'), hint = document.getElementById('hint'), spot = document.getElementById('spot');
+  /* Scroll sets the time of day */
+  var ticking = false, clock = document.getElementById('clock'), hint = null, spot = document.getElementById('spot');
   var scene = document.querySelector('.scene'), sunEl = document.querySelector('.sun'), lakefx = document.getElementById('lakefx'), sunref = document.getElementById('sunref'), fogband = document.getElementById('fogband');
-  var maxScroll = 1, lastT = -1, lastClock = '', isNight = false;
+  var wasScrolled = false, maxScroll = 1, lastT = -1, lastClock = '', isNight = false;
   /* Lake light lives in plain layers above the drawing, so the drawing itself never has to repaint */
   (function () {
     if (!lakefx) return; var r = rng(77), o = '';
-    for (var q = 0; q < 16; q++) o += '<i style="left:' + (r() * 96).toFixed(1) + '%;top:' + (r() * 92).toFixed(1) + '%;width:' + (14 + r() * 40).toFixed(0) + 'px;animation-delay:-' + (r() * 4).toFixed(1) + 's"></i>';
+    for (var q = 0; q < 16; q++) o += '<i style="left:' + (r() < .5 ? r() * 24 : 72 + r() * 24).toFixed(1) + '%;top:' + (r() * 92).toFixed(1) + '%;width:' + (14 + r() * 40).toFixed(0) + 'px;animation-delay:-' + (r() * 4).toFixed(1) + 's"></i>';
     lakefx.innerHTML = o;
   })();
   var parts = {};
@@ -147,6 +147,7 @@
       if (clock && txt !== lastClock) { lastClock = txt; clock.textContent = txt; }
     }
     moveRail(p);
+    var sc = (window.scrollY || 0) > 8; if (sc !== wasScrolled) { wasScrolled = sc; root.classList.toggle('scrolled', sc); }
     if (p > .01 && hint && !hint.hidden && !hint.classList.contains('out')) { hint.classList.add('out'); }
   }
   var px = 0, py = 0, spotTick = false;
@@ -154,19 +155,27 @@
 
   /* The side rail: where you are on the page, as the evening passes */
   var rail = document.getElementById('rail'), railDot = document.getElementById('rail-dot'), railLinks = rail ? Array.prototype.slice.call(rail.querySelectorAll('a')) : [], railAt = [], railH = 0, railOn = -1;
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll('.nav nav a'));
   function layRail() {
     if (!rail) return;
-    var max = maxScroll; railH = rail.offsetHeight;
-    railAt = railLinks.map(function (a) {
+    var max = maxScroll, n = railLinks.length; railH = rail.offsetHeight; railOn = -1;
+    railAt = railLinks.map(function (a, i) {
       var el = document.querySelector(a.getAttribute('href')), y = el ? el.getBoundingClientRect().top + (window.scrollY || 0) - window.innerHeight * .42 : 0;
-      var f = Math.min(1, Math.max(0, y / max)); a.style.top = (f * 100).toFixed(2) + '%'; return f;
+      a.style.top = (i / (n - 1) * 100).toFixed(2) + '%';        // labels sit evenly; the dot travels between them
+      return Math.min(.965, Math.max(0, y / max));
     });
+    for (var k = 1; k < n; k++) if (railAt[k] <= railAt[k - 1]) railAt[k] = railAt[k - 1] + .001;
   }
   function moveRail(p) {
     if (!rail || !railAt.length) return;
-    railDot.style.transform = 'translate3d(0,' + (p * railH).toFixed(1) + 'px,0)';
-    var on = 0; for (var i = 0; i < railAt.length; i++) if (p >= railAt[i] - .004) on = i;
-    if (on !== railOn) { railOn = on; railLinks.forEach(function (a, i) { a.classList.toggle('on', i === on); }); }
+    var n = railAt.length, on = 0;
+    for (var i = 0; i < n; i++) if (p >= railAt[i] - .004) on = i;
+    if (on !== railOn) {
+      railOn = on; var href = railLinks[on].getAttribute('href');
+      railDot.style.transform = 'translate3d(0,' + (on / (n - 1) * railH).toFixed(1) + 'px,0)';
+      railLinks.forEach(function (a, i) { a.classList.toggle('on', i === on); });
+      navLinks.forEach(function (a) { var act = a.getAttribute('href') === href; a.classList.toggle('active', act); if (act) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
+    }
   }
   function ask() { if (!ticking) { ticking = true; requestAnimationFrame(paint); } }
   window.addEventListener('scroll', ask, { passive: true });
@@ -182,14 +191,14 @@
   function buildHeap() {
     var r = rng(2028), bins = [1, 2, 4, 6, 9, 11, 12, 11, 9, 6, 4, 2, 1];
     // fit the whole figure, heading and caption on one screen, whatever its size
-    var avail = Math.min(window.innerWidth - 96, 468), room = window.innerHeight - 300;
-    var step = Math.max(13, Math.min(36, Math.floor(avail / 13), Math.floor((room - 60) / 12)));
-    if (step === heapStep) return; heapStep = step;
+    var avail = Math.min(window.innerWidth - 40, 540), room = window.innerHeight - 300;
+    var step = Math.max(13, Math.min(36, Math.floor(avail / 15.8), Math.floor((room - 60) / 12)));
+    if (step === heapStep) return; if (heapStep && heap.classList.contains('in')) heap.classList.add('settled'); heapStep = step;
     var W = 13 * step, AX = 30, H = 12 * step + 30 + AX, base = H - AX, html = '', sig = 2.55, mu = 6.5;
     heap.style.width = W + 'px'; heap.style.height = H + 'px';
     for (var b = 0; b < 13; b++) for (var k = 0; k < bins[b]; k++) {
       var core = b >= 4 && b <= 8;                                // within one standard deviation of the mean
-      var ang = r() * 6.2832, dist = 220 + r() * 420;
+      var ang = r() * 6.2832, dist = Math.min(220 + r() * 420, window.innerWidth * .42);
       var sx = Math.cos(ang) * dist, sy = -Math.abs(Math.sin(ang)) * dist * .8 - 60, d = 200 + k * 120 + Math.abs(b - 6) * 70 + r() * 700;
       html += '<span' + (core ? ' class="core"' : '') + ' style="left:' + (b * step) + 'px;bottom:' + (AX + k * step) + 'px;width:' + step + 'px;height:' + step + 'px;--sx:' + sx.toFixed(0) + 'px;--sy:' + sy.toFixed(0) + 'px;--cx:' + ((r() - .5) * 120).toFixed(0) + 'px;--d:' + d.toFixed(0) + 'ms"><i class="fly" style="--sz:' + (30 + r() * 16).toFixed(0) + '%;--bl:' + (2.6 + r() * 3).toFixed(1) + 's;--bd:-' + (r() * 5).toFixed(1) + 's"></i></span>';
     }
@@ -243,7 +252,7 @@
   }
 
   /* Project cards tilt toward the pointer and catch the light */
-  Array.prototype.forEach.call(document.querySelectorAll('.card:not(.ghost)'), function (card) {
+  Array.prototype.forEach.call(document.querySelectorAll('#trading .card'), function (card) {
     if (reduce) return;
     card.addEventListener('pointermove', function (e) {
       var b = card.getBoundingClientRect(), x = (e.clientX - b.left) / b.width, y = (e.clientY - b.top) / b.height;
@@ -304,7 +313,10 @@
     var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { playSim(); io.disconnect(); } }, { threshold: .45 });
     io.observe(canvas);
   }
-  document.getElementById('trading').querySelector('.card').addEventListener('click', function () { simulate((Math.random() * 1e9) | 0); playSim(); });
+  (function () {
+    function again() { simulate((Math.random() * 1e9) | 0); playSim(); }
+    document.getElementById('trading').querySelector('.card').addEventListener('click', again);
+  })();
 
   /* ---------- The intro: sign the name, then write the story one word at a time ---------- */
   var sig = document.querySelector('.sig'), pill = document.getElementById('pill'), ff = document.getElementById('ff');
@@ -345,16 +357,25 @@
   window.addEventListener('scroll', pin, { passive: true });
   window.addEventListener('load', pin); window.addEventListener('pageshow', pin);
   function later(fn, ms) { timer = setTimeout(fn, ms / speed); }
+  var held = [document.querySelector('.nav'), document.getElementById('rail')].concat(Array.prototype.slice.call(document.querySelectorAll('.after')));
+  var heroLinks = Array.prototype.slice.call(document.querySelectorAll('.hero a'));
+  function setInert(on) { heroLinks.forEach(function (a) { if (on) a.setAttribute('tabindex', '-1'); else a.removeAttribute('tabindex'); }); held.forEach(function (el) { if (!el) return; if (on) el.setAttribute('inert', ''); else el.removeAttribute('inert'); }); }
+  var firstFinish = true, replayT = 0, replayPending = false;
   function finish() {
-    if (done) return; done = true;
+    if (done) return; done = true; clearTimeout(replayT);
+    if (firstFinish) { // a link straight to a section still lands there once the intro is out of the way
+      firstFinish = false; var target = null; try { target = location.hash.length > 1 && document.querySelector(location.hash); } catch (e) {}
+      if (target) setTimeout(function () { target.scrollIntoView(); }, 60);
+    }
+    if (document.activeElement && pill.contains(document.activeElement)) { try { document.getElementById('top').focus({ preventScroll: true }); } catch (e) {} }
     clearTimeout(timer);
     sig.style.setProperty('--sig-t', '.01s'); sig.classList.add('in');
     tokens.forEach(function (t) { t.el.classList.add('in'); });
-    root.classList.add('lit'); root.classList.remove('intro');
+    root.classList.add('lit'); root.classList.remove('intro'); setInert(false);
     pill.classList.add('out'); setTimeout(function () { pill.hidden = true; }, 600);
     if (!armed) { armed = true; armSim(); armReveals(); armHeap(); armNav(); }
     remeasure();
-    if (hint && (window.scrollY || 0) < 10) { hint.hidden = false; hint.classList.remove('out'); setTimeout(function () { hint.classList.add('out'); }, 9000); }
+    if (hint && (window.scrollY || 0) < 10) { hint.hidden = false; hint.classList.remove('out'); setTimeout(function () { hint.classList.add('out'); }, 5000); }
     ask();
   }
   function step() {
@@ -362,7 +383,7 @@
     if (idx >= tokens.length) { later(finish, 900); return; }
     var t = tokens[idx++];
     later(function () {
-      t.el.classList.add('in');
+      t.el.classList.add('in'); var la = t.el.tagName === 'A' ? t.el : t.el.querySelector && t.el.querySelector('a'); if (la) la.removeAttribute('tabindex');
       // scrolling is locked during the intro, so follow the writing on short screens
       var box = t.el.getBoundingClientRect();
       var line = window.innerHeight * .6;
@@ -373,26 +394,36 @@
     }, t.para && idx > 1 ? 700 : 0);
   }
   function startIntro() {
-    lockY = 0; goalY = 0; jump(0); root.classList.add('ready'); setTimeout(pin, 300); setTimeout(pin, 1200);
+    replayPending = false; done = false; lockY = 0; goalY = 0; gliding = false; jump(0); root.classList.add('ready'); setInert(true); setTimeout(pin, 300); setTimeout(pin, 1200);
     pill.hidden = false; pill.classList.remove('out');
+    try { document.getElementById('skip').focus({ preventScroll: true }); } catch (e) {}
     requestAnimationFrame(function () { requestAnimationFrame(function () { sig.classList.add('in'); }); });
     timer = setTimeout(function () { root.classList.add('lit'); step(); }, 1900);
   }
   document.getElementById('skip').addEventListener('click', finish);
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    if (replayPending) { clearTimeout(replayT); replayPending = false; done = false; }
+    if (!done) finish();
+  });
+  document.querySelector('.hero').addEventListener('click', function (e) { // following a link in the story ends the intro first
+    var a = e.target.closest && e.target.closest('a[href^="#"]'); if (a && !done) finish();
+  });
   ff.addEventListener('click', function () { speed = speed === 1 ? 6 : 1; ff.setAttribute('aria-pressed', speed > 1); });
   window.scrollTo(0, 0);
   if (document.fonts && document.fonts.ready) {
     var go = false, once = function () { if (!go) { go = true; startIntro(); } };
-    document.fonts.ready.then(once); setTimeout(once, 1500);
+    var sigFont = document.fonts.load ? document.fonts.load('52px "Mr Dafoe"') : document.fonts.ready;
+    Promise.all([sigFont, document.fonts.ready]).then(once, once); setTimeout(once, 2500);
   } else startIntro();
 
   document.getElementById('replay').addEventListener('click', function () {
-    clearTimeout(timer); lockY = 0; done = false; idx = 0; speed = 1; ff.setAttribute('aria-pressed', 'false');
+    clearTimeout(timer); clearTimeout(replayT); firstFinish = false; lockY = 0; done = true; idx = 0; speed = 1; ff.setAttribute('aria-pressed', 'false');
     window.scrollTo(0, 0);
     sig.style.removeProperty('--sig-t'); sig.classList.remove('in');
     tokens.forEach(function (t) { t.el.classList.remove('in'); });
-    root.classList.add('intro');
-    setTimeout(startIntro, 400);
+    root.classList.add('intro'); setInert(true);
+    replayPending = true; replayT = setTimeout(startIntro, 400);
   });
 
   /* ---------- Small touches: copy email, roll the logo die, mark the current section ---------- */
@@ -408,12 +439,5 @@
     logo.querySelector('g').innerHTML = LP[n].map(function (p) { return '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="1.9"/>'; }).join('');
     logo.classList.remove('roll'); void logo.offsetWidth; logo.classList.add('roll');
   });
-  function armNav() {
-    if (!('IntersectionObserver' in window)) return;
-    var links = Array.prototype.slice.call(document.querySelectorAll('.nav nav a'));
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) { if (en.isIntersecting) links.forEach(function (a) { a.classList.toggle('active', a.getAttribute('href') === '#' + en.target.id); }); });
-    }, { rootMargin: '-30% 0px -60% 0px' });
-    links.forEach(function (a) { var s = document.querySelector(a.getAttribute('href')); if (s) io.observe(s); });
-  }
+  function armNav() { layRail(); ask(); }
 })();
