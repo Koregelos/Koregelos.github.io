@@ -329,7 +329,7 @@
         node.textContent.split(/(\s+)/).forEach(function (part) {
           if (!part) return;
           if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(part)); return; }
-          var s = document.createElement('span'); s.className = 'tok'; s.textContent = part; frag.appendChild(s);
+          var s = document.createElement('span'); s.className = 'tok w'; s.textContent = part; frag.appendChild(s);
           tokens.push({ el: s, para: first, text: part }); first = false;
         });
         p.replaceChild(frag, node);
@@ -362,7 +362,7 @@
   function setInert(on) { heroLinks.forEach(function (a) { if (on) a.setAttribute('tabindex', '-1'); else a.removeAttribute('tabindex'); }); held.forEach(function (el) { if (!el) return; if (on) el.setAttribute('inert', ''); else el.removeAttribute('inert'); }); }
   var firstFinish = true, replayT = 0, replayPending = false;
   function finish() {
-    if (done) return; done = true; clearTimeout(replayT);
+    if (done) return; done = true; clearTimeout(replayT); if (pen) pen.classList.remove('on');
     if (firstFinish) { // a link straight to a section still lands there once the intro is out of the way
       firstFinish = false; var target = null; try { target = location.hash.length > 1 && document.querySelector(location.hash); } catch (e) {}
       if (target) setTimeout(function () { target.scrollIntoView(); }, 60);
@@ -378,17 +378,31 @@
     if (hint && (window.scrollY || 0) < 10) { hint.hidden = false; hint.classList.remove('out'); setTimeout(function () { hint.classList.add('out'); }, 5000); }
     ask();
   }
+  /* The firefly pen: it leads the signature, then sits at the tip of the newest word */
+  var pen = document.getElementById('pen'), hero = document.querySelector('.hero');
+  function penTo(el, dur, atStart) {
+    if (!pen || !el) return;
+    var h = hero.getBoundingClientRect(), b = el.getBoundingClientRect();
+    pen.style.setProperty('--pen-t', dur + 's');
+    pen.style.transform = 'translate3d(' + ((atStart ? b.left : b.right + 5) - h.left).toFixed(1) + 'px,' + (b.top + b.height * .66 - h.top).toFixed(1) + 'px,0)';
+  }
+  function penAway() {
+    if (!pen) return; pen.style.setProperty('--pen-t', '1.6s');
+    var m = /translate3d\(([-\d.]+)px,\s*([-\d.]+)px/.exec(pen.style.transform || '');
+    if (m) pen.style.transform = 'translate3d(' + (+m[1] + 90) + 'px,' + (+m[2] - 130) + 'px,0)';
+    pen.classList.remove('on');
+  }
   function step() {
     if (done) return;
-    if (idx >= tokens.length) { later(finish, 900); return; }
+    if (idx >= tokens.length) { penAway(); later(finish, 1100); return; }
     var t = tokens[idx++];
     later(function () {
       t.el.classList.add('in'); var la = t.el.tagName === 'A' ? t.el : t.el.querySelector && t.el.querySelector('a'); if (la) la.removeAttribute('tabindex');
       // scrolling is locked during the intro, so follow the writing on short screens
-      var box = t.el.getBoundingClientRect();
+      var box = t.el.getBoundingClientRect(); var isScript = t.el.classList.contains('script'); penTo(t.el, isScript ? 1.1 : t.para ? .5 : .26);
       var line = window.innerHeight * .6;
       if (box.bottom > line) { goalY = Math.max(goalY, (window.scrollY || 0) + box.bottom - line); if (!gliding) { gliding = true; requestAnimationFrame(glide); } }
-      var hold = t.ico ? 70 : t.rich ? 370 : 148;
+      var hold = isScript ? 1050 : t.ico ? 70 : t.rich ? 370 : 148;
       if (/[.!?]$/.test(t.text)) hold += 420; else if (/,$/.test(t.text)) hold += 170;
       later(step, hold);
     }, t.para && idx > 1 ? 700 : 0);
@@ -397,7 +411,12 @@
     replayPending = false; done = false; lockY = 0; goalY = 0; gliding = false; jump(0); root.classList.add('ready'); setInert(true); setTimeout(pin, 300); setTimeout(pin, 1200);
     pill.hidden = false; pill.classList.remove('out');
     try { document.getElementById('skip').focus({ preventScroll: true }); } catch (e) {}
-    requestAnimationFrame(function () { requestAnimationFrame(function () { sig.classList.add('in'); }); });
+    var sigSpan = sig.querySelector('span');
+    if (pen) { pen.classList.remove('on'); penTo(sigSpan, 0, true); }
+    requestAnimationFrame(function () { requestAnimationFrame(function () {
+      sig.classList.add('in');
+      if (pen) { pen.classList.add('on'); pen.style.setProperty('--pen-t', '1.7s'); penTo(sigSpan, 1.7); pen.style.transitionTimingFunction = 'cubic-bezier(.45, .05, .35, 1)'; setTimeout(function () { pen.style.transitionTimingFunction = ''; }, 1800); }
+    }); });
     timer = setTimeout(function () { root.classList.add('lit'); step(); }, 1900);
   }
   document.getElementById('skip').addEventListener('click', finish);
