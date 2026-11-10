@@ -24,7 +24,7 @@
       { base: 640, amp: 120, peak: .55, c1: '#7d5a94', c2: '#6a4d88', pines: 0 },
       { base: 705, amp: 95, peak: .25, c1: '#51417a', c2: '#43376c', pines: 46, size: 20 },
       { base: 790, amp: 80, peak: .1, c1: '#2e2857', c2: '#252049', pines: 30, size: 40 },
-      { base: 905, amp: 48, peak: 0, c1: '#15132f', c2: '#100e26', pines: 9, size: 120 }
+      { base: 905, amp: 48, peak: 0, c1: '#15132f', c2: '#100e26', pines: 13, size: 120 }
     ];
     defs.forEach(function (d, i) {
       var f1 = .0028 + r() * .0016, f2 = .0071 + r() * .003, f3 = .019 + r() * .008, p1 = r() * 9, p2 = r() * 9, p3 = r() * 9;
@@ -46,6 +46,14 @@
         for (var s = 0; s < 4; s++) { var top = py - h + s * h * .2, ww = w * (.45 + s * .2); tree += 'M' + px.toFixed(1) + ' ' + top.toFixed(1) + ' l' + ww.toFixed(1) + ' ' + (h * .38).toFixed(1) + ' h-' + (ww * 2).toFixed(1) + 'z '; }
         body += '<path fill="' + d.c2 + '" d="' + tree + 'M' + (px - w * .1).toFixed(1) + ' ' + (py - 4).toFixed(1) + ' h' + (w * .2).toFixed(1) + ' v8 h-' + (w * .2).toFixed(1) + 'z"/>';
       }
+      if (i === 4) { // a cabin on the near shore, its window lit
+        [[212, 1], [1418, .8]].forEach(function (c) {
+          var cx = c[0], k2 = c[1], cy = Y(cx) + 4, w2 = 38 * k2, h2 = 20 * k2;
+          body += '<path fill="#1b1838" d="M' + (cx - w2 / 2) + ' ' + cy + ' v-' + h2 + ' l' + (w2 / 2) + ' -' + (h2 * .8) + ' l' + (w2 / 2) + ' ' + (h2 * .8) + ' v' + h2 + 'z M' + (cx + w2 * .2) + ' ' + (cy - h2 * 1.2) + ' v-' + (h2 * .7) + ' h' + (w2 * .14) + ' v' + (h2 * .85) + 'z"/>' +
+            '<circle class="win-glow" cx="' + (cx - w2 * .18) + '" cy="' + (cy - h2 * .5) + '" r="' + (16 * k2) + '" fill="url(#winglow)"/>' +
+            '<rect class="win" x="' + (cx - w2 * .3) + '" y="' + (cy - h2 * .75) + '" width="' + (w2 * .24) + '" height="' + (h2 * .5) + '" rx="1" fill="#ffd27a"/>';
+        });
+      }
       // haze sitting in the valley behind this ridge
       var mist = i > 0 && i < 5 ? '<rect x="-120" y="' + (d.base - d.amp * .25) + '" width="1840" height="' + (d.amp * .9) + '" fill="url(#mist)" opacity="' + (.5 - i * .07) + '"/>' : '';
       var water = '';
@@ -56,8 +64,25 @@
       }
       svg += '<defs>' + g + '</defs>' + mist + water + '<g data-depth="' + (i + 1) + '">' + body + '</g>';
     });
-    land.innerHTML = '<defs><linearGradient id="lake" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a5e9c" stop-opacity="0"/><stop offset=".22" stop-color="#6a5092"/><stop offset=".5" stop-color="#4a3b7a"/><stop offset="1" stop-color="#2b2556"/></linearGradient><radialGradient id="ref"><stop offset="0" stop-color="#fff3d0" stop-opacity=".95"/><stop offset=".5" stop-color="#ffc98f" stop-opacity=".5"/><stop offset="1" stop-color="#ffc98f" stop-opacity="0"/></radialGradient><linearGradient id="mist" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd9c2" stop-opacity="0"/><stop offset=".5" stop-color="#ffd9c2" stop-opacity=".55"/><stop offset="1" stop-color="#ffd9c2" stop-opacity="0"/></linearGradient></defs>' + svg;
+    land.innerHTML = '<defs><radialGradient id="winglow"><stop offset="0" stop-color="#ffc66b" stop-opacity=".55"/><stop offset="1" stop-color="#ffc66b" stop-opacity="0"/></radialGradient><linearGradient id="lake" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a5e9c" stop-opacity="0"/><stop offset=".22" stop-color="#6a5092"/><stop offset=".5" stop-color="#4a3b7a"/><stop offset="1" stop-color="#2b2556"/></linearGradient><radialGradient id="ref"><stop offset="0" stop-color="#fff3d0" stop-opacity=".95"/><stop offset=".5" stop-color="#ffc98f" stop-opacity=".5"/><stop offset="1" stop-color="#ffc98f" stop-opacity="0"/></radialGradient><linearGradient id="mist" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd9c2" stop-opacity="0"/><stop offset=".5" stop-color="#ffd9c2" stop-opacity=".55"/><stop offset="1" stop-color="#ffd9c2" stop-opacity="0"/></linearGradient></defs>' + svg;
     layers = Array.prototype.slice.call(land.querySelectorAll('g[data-depth]'));
+  })();
+
+  /* Constellations for the side skies: a bell curve, a sigma and the five of a die */
+  (function () {
+    var el = document.getElementById('consts'); if (!el) return;
+    function fig(pts, links, label, lx, ly) {
+      var o = '<g>';
+      links.forEach(function (l) { o += '<path d="M' + pts[l[0]][0] + ' ' + pts[l[0]][1] + ' L' + pts[l[1]][0] + ' ' + pts[l[1]][1] + '"/>'; });
+      pts.forEach(function (q, n) { o += '<circle cx="' + q[0] + '" cy="' + q[1] + '" r="' + (n % 3 === 0 ? 2.6 : 1.9) + '"/>'; });
+      if (label) o += '<text x="' + lx + '" y="' + ly + '">' + label + '</text>';
+      return o + '</g>';
+    }
+    var bell = [], n, x; for (n = 0; n < 9; n++) { x = (n - 4) / 4 * 2.4; bell.push([Math.round(188 + n * 29), Math.round(404 - 116 * Math.exp(-x * x / 2))]); }
+    var chain = []; for (n = 0; n < 8; n++) chain.push([n, n + 1]);
+    el.innerHTML = fig(bell, chain, 'N(\u03bc, \u03c3\u00b2)', 304, 432) +
+      fig([[1452, 118], [1352, 118], [1408, 186], [1350, 256], [1456, 256]], [[0, 1], [1, 2], [2, 3], [3, 4]], '\u03a3', 1478, 262) +
+      fig([[1240, 318], [1296, 318], [1268, 346], [1240, 374], [1296, 374]], [[0, 1], [1, 4], [4, 3], [3, 0]], '', 0, 0);
   })();
 
   /* Stars and fireflies */
@@ -95,6 +120,7 @@
     root.classList.toggle('night', t > .7);
     var mins = Math.round(18.5 * 60 + t * 5 * 60), hh = Math.floor(mins / 60), mm = mins % 60;
     if (clock) clock.textContent = (hh > 12 ? hh - 12 : hh) + ':' + (mm < 10 ? '0' : '') + mm + ' pm';
+    moveRail(p);
     if (sunref) { sunref.setAttribute('opacity', Math.max(0, 1 - t * 2.2).toFixed(2)); }
     if (p > .01 && hint && !hint.hidden) { hint.classList.add('out'); }
     if (reduce) return;
@@ -103,6 +129,23 @@
       layers[i].setAttribute('transform', 'translate(' + (-tx * dpt * 5).toFixed(1) + ' ' + (p * dpt * 7 - ty * dpt * 2).toFixed(1) + ')');
     }
   }
+  /* The side rail: where you are on the page, as the evening passes */
+  var rail = document.getElementById('rail'), railDot = document.getElementById('rail-dot'), railLinks = rail ? Array.prototype.slice.call(rail.querySelectorAll('a')) : [], railAt = [];
+  function layRail() {
+    if (!rail) return;
+    var max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    railAt = railLinks.map(function (a) {
+      var el = document.querySelector(a.getAttribute('href')), y = el ? el.getBoundingClientRect().top + (window.scrollY || 0) - 90 : 0;
+      var f = Math.min(1, Math.max(0, y / max)); a.style.top = (f * 100).toFixed(2) + '%'; return f;
+    });
+  }
+  function moveRail(p) {
+    if (!rail || !railAt.length) return;
+    railDot.style.top = (p * 100).toFixed(2) + '%';
+    var on = 0; for (var i = 0; i < railAt.length; i++) if (p >= railAt[i] - .012) on = i;
+    railLinks.forEach(function (a, i) { a.classList.toggle('on', i === on); });
+  }
+  window.addEventListener('resize', function () { setTimeout(layRail, 260); }); window.addEventListener('load', layRail);
   function ask() { if (!ticking) { ticking = true; requestAnimationFrame(paint); } }
   window.addEventListener('scroll', ask, { passive: true });
   window.addEventListener('resize', ask);
@@ -111,9 +154,13 @@
 
   /* ---------- The ending: 78 fireflies settle into 13 bins as a bell curve ---------- */
   var heap = document.getElementById('heap');
-  (function buildHeap() {
+  var heapStep = 0;
+  function buildHeap() {
     var r = rng(2028), bins = [1, 2, 4, 6, 9, 11, 12, 11, 9, 6, 4, 2, 1];
-    var avail = Math.min(window.innerWidth - 96, 468), step = Math.max(18, Math.min(36, Math.floor(avail / 13)));
+    // fit the whole figure, heading and caption on one screen, whatever its size
+    var avail = Math.min(window.innerWidth - 96, 468), room = window.innerHeight - 300;
+    var step = Math.max(13, Math.min(36, Math.floor(avail / 13), Math.floor((room - 60) / 12)));
+    if (step === heapStep) return; heapStep = step;
     var W = 13 * step, AX = 30, H = 12 * step + 30 + AX, base = H - AX, html = '', sig = 2.55, mu = 6.5;
     heap.style.width = W + 'px'; heap.style.height = H + 'px';
     for (var b = 0; b < 13; b++) for (var k = 0; k < bins[b]; k++) {
@@ -135,7 +182,9 @@
       '<g class="late"><path class="band" d="M' + ((mu - sig) * step).toFixed(1) + ' ' + base + ' L' + band.join(' L') + ' L' + ((mu + sig) * step).toFixed(1) + ' ' + base + ' Z"/>' +
       '<path class="axis" d="M' + (-1.4 * step).toFixed(1) + ' ' + base + ' H' + (14.4 * step).toFixed(1) + '"/>' + ax + '</g>' +
       '<path class="curve" pathLength="1" d="M' + pts.join(' L') + '"/></svg>' + html;
-  })();
+  }
+  buildHeap();
+  var heapT = 0; window.addEventListener('resize', function () { clearTimeout(heapT); heapT = setTimeout(buildHeap, 180); });
   function armHeap() {
     if (reduce || !('IntersectionObserver' in window)) { heap.classList.add('in'); return; }
     var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { heap.classList.add('in'); io.disconnect(); } }, { threshold: .35 });
@@ -274,6 +323,7 @@
     root.classList.add('lit'); root.classList.remove('intro');
     pill.classList.add('out'); setTimeout(function () { pill.hidden = true; }, 600);
     if (!armed) { armed = true; armSim(); armReveals(); armHeap(); armNav(); }
+    layRail(); setTimeout(layRail, 1200);
     if (hint && (window.scrollY || 0) < 10) { hint.hidden = false; hint.classList.remove('out'); setTimeout(function () { hint.classList.add('out'); }, 9000); }
     ask();
   }
