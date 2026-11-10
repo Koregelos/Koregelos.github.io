@@ -14,7 +14,7 @@
   }
 
   /* ---------- The landscape: layered ridgelines, pines and a distant flag, drawn as SVG ---------- */
-  var land = document.getElementById('land'), layers = [];
+  var land = document.getElementById('land');
   (function buildLand() {
     var r = rng(916), svg = '';
     var defs = [
@@ -58,14 +58,11 @@
       var mist = i > 0 && i < 5 ? '<rect x="-120" y="' + (d.base - d.amp * .25) + '" width="1840" height="' + (d.amp * .9) + '" fill="url(#mist)" opacity="' + (.5 - i * .07) + '"/>' : '';
       var water = '';
       if (i === 5) { // a lake in the last valley, catching the sky
-        water = '<g id="water"><rect x="-120" y="790" width="1840" height="176" fill="url(#lake)"/><ellipse id="sunref" cx="1296" cy="856" rx="20" ry="74" fill="url(#ref)"/>';
-        for (var q = 0; q < 26; q++) { var wx = -60 + r() * 1720, wy = 826 + r() * 60, wl = 14 + r() * 44; water += '<path class="shim" style="animation-delay:-' + (r() * 4).toFixed(1) + 's" d="M' + wx.toFixed(0) + ' ' + wy.toFixed(0) + ' h' + wl.toFixed(0) + '" stroke="#fff1dc" stroke-width="1.2" stroke-linecap="round"/>'; }
-        water += '<rect class="fog" x="-200" y="770" width="2000" height="90" fill="url(#mist)" opacity=".5"/></g>';
+        water = '<g id="water"><rect x="-120" y="790" width="1840" height="176" fill="url(#lake)"/><rect x="-200" y="770" width="2000" height="90" fill="url(#mist)" opacity=".4"/></g>';
       }
       svg += '<defs>' + g + '</defs>' + mist + water + '<g data-depth="' + (i + 1) + '">' + body + '</g>';
     });
     land.innerHTML = '<defs><radialGradient id="winglow"><stop offset="0" stop-color="#ffc66b" stop-opacity=".55"/><stop offset="1" stop-color="#ffc66b" stop-opacity="0"/></radialGradient><linearGradient id="lake" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a5e9c" stop-opacity="0"/><stop offset=".22" stop-color="#6a5092"/><stop offset=".5" stop-color="#4a3b7a"/><stop offset="1" stop-color="#2b2556"/></linearGradient><radialGradient id="ref"><stop offset="0" stop-color="#fff3d0" stop-opacity=".95"/><stop offset=".5" stop-color="#ffc98f" stop-opacity=".5"/><stop offset="1" stop-color="#ffc98f" stop-opacity="0"/></radialGradient><linearGradient id="mist" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd9c2" stop-opacity="0"/><stop offset=".5" stop-color="#ffd9c2" stop-opacity=".55"/><stop offset="1" stop-color="#ffd9c2" stop-opacity="0"/></linearGradient></defs>' + svg;
-    layers = Array.prototype.slice.call(land.querySelectorAll('g[data-depth]'));
   })();
 
   /* Constellations for the side skies: a bell curve, a sigma and the five of a die */
@@ -87,13 +84,14 @@
 
   /* Stars and fireflies */
   (function () {
-    var r = rng(41), s = '', n = window.innerWidth < 700 ? 90 : 230;
+    var r = rng(41), s = '', n = window.innerWidth < 700 ? 80 : 190, tw = 0;
     for (var i = 0; i < n; i++) {
-      var size = r() < .12 ? 3 : r() < .5 ? 2 : 1.4;
-      s += '<i' + (r() < .3 ? ' class="tw"' : '') + ' style="left:' + (r() * 100).toFixed(2) + '%;top:' + (r() * 100).toFixed(2) + '%;width:' + size + 'px;height:' + size + 'px;opacity:' + (.45 + r() * .55).toFixed(2) + ';animation-delay:' + (r() * 4).toFixed(1) + 's"></i>';
+      var size = r() < .12 ? 3 : r() < .5 ? 2 : 1.4, y = r(), fade = 1 - Math.pow(y, 2.2);   // thin out toward the horizon
+      var twk = r() < .3 && tw < 22; if (twk) tw++;
+      s += '<i' + (twk ? ' class="tw"' : '') + ' style="left:' + (r() * 100).toFixed(2) + '%;top:' + (y * 100).toFixed(2) + '%;width:' + size + 'px;height:' + size + 'px;opacity:' + ((.45 + r() * .55) * fade).toFixed(2) + ';animation-delay:' + (r() * 4).toFixed(1) + 's"></i>';
     }
     document.getElementById('stars').innerHTML = s;
-    var f = '', m = window.innerWidth < 700 ? 12 : 26;
+    var f = '', m = window.innerWidth < 700 ? 10 : 18;
     function d() { return ((r() - .5) * 90).toFixed(0) + 'px'; }
     for (var k = 0; k < m; k++) {
       var sz = 3 + r() * 3;
@@ -103,53 +101,79 @@
   })();
 
   /* Scroll sets the time of day; the pointer and scroll shift the ridges for depth */
-  var tx = 0, ty = 0, ticking = false, clock = document.getElementById('clock'), hint = document.getElementById('hint'), spot = document.getElementById('spot');
-  var sunref = document.getElementById('sunref'), sunEl = document.querySelector('.sun');
-  function placeReflection() { // line the lake's reflection up under the sun at any window shape
-    var w = window.innerWidth, h = window.innerHeight, scale = Math.max(w / 1600, h / 900);
-    var sx = parseFloat(getComputedStyle(sunEl).left);
-    if (sunref && !isNaN(sx)) sunref.setAttribute('cx', (800 + (sx - w / 2) / scale).toFixed(0));
+  var ticking = false, clock = document.getElementById('clock'), hint = document.getElementById('hint'), spot = document.getElementById('spot');
+  var scene = document.querySelector('.scene'), sunEl = document.querySelector('.sun'), lakefx = document.getElementById('lakefx'), sunref = document.getElementById('sunref'), fogband = document.getElementById('fogband');
+  var maxScroll = 1, lastT = -1, lastClock = '', isNight = false;
+  /* Lake light lives in plain layers above the drawing, so the drawing itself never has to repaint */
+  (function () {
+    if (!lakefx) return; var r = rng(77), o = '';
+    for (var q = 0; q < 16; q++) o += '<i style="left:' + (r() * 96).toFixed(1) + '%;top:' + (r() * 92).toFixed(1) + '%;width:' + (14 + r() * 40).toFixed(0) + 'px;animation-delay:-' + (r() * 4).toFixed(1) + 's"></i>';
+    lakefx.innerHTML = o;
+  })();
+  var parts = {};
+  function fade(sel, o, tf) { // set one layer's opacity (and position) directly; hidden layers cost nothing
+    var el = parts[sel] || (parts[sel] = scene.querySelector(sel)); if (!el) return;
+    o = o < .004 ? 0 : o > 1 ? 1 : o;
+    el.style.opacity = o.toFixed(3); el.style.visibility = o ? 'visible' : 'hidden';
+    if (tf) el.style.transform = tf;
   }
-  placeReflection(); window.addEventListener('resize', placeReflection);
+  function measure() { // everything that depends on the window's size, done once per resize rather than per frame
+    var w = window.innerWidth, h = window.innerHeight, scale = Math.max(w / 1600, h / 900);
+    function Y(y) { return h - (900 - y) * scale; }
+    maxScroll = Math.max(1, document.documentElement.scrollHeight - h); lastT = -1;
+    if (lakefx) { lakefx.style.top = Y(822) + 'px'; lakefx.style.height = (70 * scale) + 'px'; }
+    if (fogband) { fogband.style.top = Y(760) + 'px'; fogband.style.height = (110 * scale) + 'px'; }
+    var sx = parseFloat(getComputedStyle(sunEl).left);
+    if (sunref && !isNaN(sx)) { sunref.style.left = sx + 'px'; sunref.style.top = Y(800) + 'px'; sunref.style.height = (100 * scale) + 'px'; sunref.style.width = (34 * scale) + 'px'; }
+  }
+  measure();
+  var measT = 0; function remeasure() { clearTimeout(measT); measT = setTimeout(function () { measure(); layRail(); ask(); }, 150); }
+  window.addEventListener('resize', remeasure); window.addEventListener('load', remeasure);
+  if ('ResizeObserver' in window) new ResizeObserver(remeasure).observe(document.body);
   function paint() {
     ticking = false;
-    var max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-    var p = Math.min(1, Math.max(0, (window.scrollY || 0) / max));
-    var t = Math.min(1, p * 1.25);
-    root.style.setProperty('--t', t.toFixed(3));
-    root.classList.toggle('night', t > .7);
-    var mins = Math.round(18.5 * 60 + t * 5 * 60), hh = Math.floor(mins / 60), mm = mins % 60;
-    if (clock) clock.textContent = (hh > 12 ? hh - 12 : hh) + ':' + (mm < 10 ? '0' : '') + mm + ' pm';
-    moveRail(p);
-    if (sunref) { sunref.setAttribute('opacity', Math.max(0, 1 - t * 2.2).toFixed(2)); }
-    if (p > .01 && hint && !hint.hidden) { hint.classList.add('out'); }
-    if (reduce) return;
-    for (var i = 0; i < layers.length; i++) {
-      var dpt = i + 1;
-      layers[i].setAttribute('transform', 'translate(' + (-tx * dpt * 5).toFixed(1) + ' ' + (p * dpt * 7 - ty * dpt * 2).toFixed(1) + ')');
+    var p = Math.min(1, Math.max(0, (window.scrollY || 0) / maxScroll));
+    var t = Math.round(Math.min(1, p * 1.25) * 200) / 200;
+    if (t !== lastT) {
+      lastT = t; var vh = window.innerHeight;
+      fade('.sky-night', t); fade('.nightwash', .8 * t); fade('.stars', 1.5 * t - .3); fade('.milky', (t - .5) * 2);
+      fade('.aurora', Math.min(.85, (t - .55) * 1.9)); fade('.consts', 2.4 * t - 1.3); fade('.flies', .18 + .82 * t);
+      fade('.sun', 1 - .9 * t, 'translate3d(0,' + (t * .3 * vh).toFixed(1) + 'px,0)');
+      fade('.moon', 1.6 * t - .6, 'translate3d(0,' + ((1 - t) * .16 * vh).toFixed(1) + 'px,0) rotate(-20deg)');
+      fade('.c1', .82 - .7 * t); fade('.c2', .82 - .7 * t); fade('.c3', .82 - .7 * t); fade('.c4', .55 - .5 * t); fade('.c5', .82 - .7 * t);
+      fade('.birds', 1 - 3 * t); fade('.sunref', 1 - 2.2 * t); fade('.lakefx', .9 - .45 * t); fade('.fogband', 1 - .55 * t);
+      var night = t > .7; if (night !== isNight) { isNight = night; root.classList.toggle('night', night); }
+      var mins = Math.round(18.5 * 60 + t * 5 * 60), hh = Math.floor(mins / 60), mm = mins % 60, txt = (hh > 12 ? hh - 12 : hh) + ':' + (mm < 10 ? '0' : '') + mm + ' pm';
+      if (clock && txt !== lastClock) { lastClock = txt; clock.textContent = txt; }
     }
+    moveRail(p);
+    if (p > .01 && hint && !hint.hidden && !hint.classList.contains('out')) { hint.classList.add('out'); }
   }
+  var px = 0, py = 0, spotTick = false;
+  function moveSpot() { spotTick = false; spot.style.transform = 'translate3d(' + (px - 340) + 'px,' + (py - 340) + 'px,0)'; }
+
   /* The side rail: where you are on the page, as the evening passes */
-  var rail = document.getElementById('rail'), railDot = document.getElementById('rail-dot'), railLinks = rail ? Array.prototype.slice.call(rail.querySelectorAll('a')) : [], railAt = [];
+  var rail = document.getElementById('rail'), railDot = document.getElementById('rail-dot'), railLinks = rail ? Array.prototype.slice.call(rail.querySelectorAll('a')) : [], railAt = [], railH = 0, railOn = -1;
   function layRail() {
     if (!rail) return;
-    var max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    var max = maxScroll; railH = rail.offsetHeight;
     railAt = railLinks.map(function (a) {
-      var el = document.querySelector(a.getAttribute('href')), y = el ? el.getBoundingClientRect().top + (window.scrollY || 0) - 90 : 0;
+      var el = document.querySelector(a.getAttribute('href')), y = el ? el.getBoundingClientRect().top + (window.scrollY || 0) - window.innerHeight * .42 : 0;
       var f = Math.min(1, Math.max(0, y / max)); a.style.top = (f * 100).toFixed(2) + '%'; return f;
     });
   }
   function moveRail(p) {
     if (!rail || !railAt.length) return;
-    railDot.style.top = (p * 100).toFixed(2) + '%';
-    var on = 0; for (var i = 0; i < railAt.length; i++) if (p >= railAt[i] - .012) on = i;
-    railLinks.forEach(function (a, i) { a.classList.toggle('on', i === on); });
+    railDot.style.transform = 'translate3d(0,' + (p * railH).toFixed(1) + 'px,0)';
+    var on = 0; for (var i = 0; i < railAt.length; i++) if (p >= railAt[i] - .004) on = i;
+    if (on !== railOn) { railOn = on; railLinks.forEach(function (a, i) { a.classList.toggle('on', i === on); }); }
   }
-  window.addEventListener('resize', function () { setTimeout(layRail, 260); }); window.addEventListener('load', layRail);
   function ask() { if (!ticking) { ticking = true; requestAnimationFrame(paint); } }
   window.addEventListener('scroll', ask, { passive: true });
-  window.addEventListener('resize', ask);
-  window.addEventListener('pointermove', function (e) { tx = e.clientX / window.innerWidth - .5; ty = e.clientY / window.innerHeight - .5; if (spot && e.pointerType !== 'touch') { spot.style.setProperty('--sx', e.clientX + 'px'); spot.style.setProperty('--sy', e.clientY + 'px'); spot.classList.add('on'); } ask(); }, { passive: true });
+  if (spot && window.matchMedia && matchMedia('(hover: hover)').matches) window.addEventListener('pointermove', function (e) {
+    if (e.pointerType === 'touch') return; px = e.clientX; py = e.clientY; spot.classList.add('on');
+    if (!spotTick) { spotTick = true; requestAnimationFrame(moveSpot); }
+  }, { passive: true });
   paint();
 
   /* ---------- The ending: 78 fireflies settle into 13 bins as a bell curve ---------- */
@@ -184,7 +208,13 @@
       '<path class="curve" pathLength="1" d="M' + pts.join(' L') + '"/></svg>' + html;
   }
   buildHeap();
-  var heapT = 0; window.addEventListener('resize', function () { clearTimeout(heapT); heapT = setTimeout(buildHeap, 180); });
+  var heapT = 0, heapW = window.innerWidth, heapH = window.innerHeight;
+  window.addEventListener('resize', function () { // only a real change of window, not a toolbar sliding away, is worth redrawing for
+    if (window.innerWidth === heapW && Math.abs(window.innerHeight - heapH) < 140) return;
+    heapW = window.innerWidth; heapH = window.innerHeight; clearTimeout(heapT); heapT = setTimeout(buildHeap, 200);
+  });
+  if ('IntersectionObserver' in window) new IntersectionObserver(function (en) { heap.classList.toggle('live', en[0].isIntersecting); }, { rootMargin: '80px' }).observe(heap);
+  else heap.classList.add('live');
   function armHeap() {
     if (reduce || !('IntersectionObserver' in window)) { heap.classList.add('in'); return; }
     var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { heap.classList.add('in'); io.disconnect(); } }, { threshold: .35 });
@@ -323,7 +353,7 @@
     root.classList.add('lit'); root.classList.remove('intro');
     pill.classList.add('out'); setTimeout(function () { pill.hidden = true; }, 600);
     if (!armed) { armed = true; armSim(); armReveals(); armHeap(); armNav(); }
-    layRail(); setTimeout(layRail, 1200);
+    remeasure();
     if (hint && (window.scrollY || 0) < 10) { hint.hidden = false; hint.classList.remove('out'); setTimeout(function () { hint.classList.add('out'); }, 9000); }
     ask();
   }
