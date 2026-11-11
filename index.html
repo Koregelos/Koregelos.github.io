@@ -80,7 +80,7 @@
 
     <p data-type>I've been <span class="nw"><span class="ico i-chart"></span><a href="#projects">building things</a></span> with numbers since 2023. It began with <span class="badge">a resale business</span> I founded on $3,000. I automated it in <span class="nw"><span class="ico i-py">Py</span>Python,</span> ran more than 1,000 transactions, and came out <a class="soft" href="#business">roughly $20,000 ahead</a>.</p>
 
-    <p data-type>Along the way I spent two years at <a href="#education">The Real World Investing Campus</a> and finished in its highest completion tier, which took a live oral assessment and six profitable investment systems. I've also built and backtested <span class="script">over 100 investment strategies</span>, and I stress-test them with <span class="nw"><span class="ico i-die"></span><a href="#projects">Monte Carlo simulation</a></span>.</p>
+    <p data-type>Along the way I spent two years in <a href="#education">an investing program</a> and finished in its highest completion tier, which took a live oral assessment and six profitable investment systems. I've also built and backtested <span class="script">over 100 investment strategies</span>, and I stress-test them with <span class="nw"><span class="ico i-die"></span><a href="#projects">Monte Carlo simulation</a></span>.</p>
 
     <p data-type>On the side I'm fine-tuning a language model for <span class="nw"><span class="ico i-quill"></span><a href="#quillton">Quillton</a>,</span> a Mac app I'm building.</p>
 
@@ -100,7 +100,7 @@
 <p class="cue" aria-hidden="true">Scroll, and watch the sun go down <span>&darr;</span></p>
 
 <section class="block" id="projects">
-  <div class="block-head"><h2>Projects</h2><span class="aside">3 so far, more on the way</span></div>
+  <div class="block-head"><h2>Projects</h2><span class="aside">Research, software, and one game</span></div>
 
   <div class="cards">
     <article class="card-wrap reveal" id="trading">
@@ -116,6 +116,68 @@
       <p class="desc">Built and backtested over 100 investment strategies in Python and Pine Script, tested hundreds of indicators across multiple assets with a Google Sheets research process and Monte Carlo simulations, and engineered a fully automated trading system with API integrations, performance analytics, and automated risk management.</p>
     </article>
 
+    <article class="card-wrap reveal" id="usars">
+      <div class="card c-teal">
+        <div class="shot shot-usars">
+          <span class="shot-tag">TradingView &middot; backtests, not live results</span>
+          <a class="rerun go" href="https://www.tradingview.com/u/Koregelos/#published-scripts" target="_blank" rel="noopener" aria-label="My TradingView profile (opens in a new tab)">Profile &nearr;</a>
+          <div class="us-top">
+            <p class="us-name">USARS</p>
+            <ul class="us-rot" aria-label="Assets the system rotates between"><li>BTC</li><li>ETH</li><li class="on">SOL</li><li>BNB</li><li>DOGE</li><li class="cash">Cash</li></ul>
+          </div>
+          <table class="us-tab">
+            <thead><tr><th scope="col"><span class="vh">Metric</span></th><th scope="col">Original<small>from 2020</small></th><th scope="col">Open source<small>from mid-2023</small></th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Sharpe</th><td>1.49</td><td>2.43</td></tr>
+              <tr><th scope="row">Sortino</th><td>2.02</td><td>3.89</td></tr>
+              <tr><th scope="row">Omega</th><td>1.63</td><td>1.81</td></tr>
+              <tr><th scope="row">Max drawdown</th><td>54.28%</td><td>27.75%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="cap"><h3>Universal Strategy Asset Rotation System</h3><span>Nov 2024 &ndash; Jan 2025</span></div>
+      <p class="desc">An indicator I wrote in Pine Script and published on TradingView. It scores every pair of assets against each other with one trend strategy, holds whichever asset is strongest, and moves to cash when the wider market turns down. I later released an open-source version tuned by timeframe after forward-testing it for a few months. Most of my other scripts are private.</p>
+    </article>
+
+    <article class="card-wrap reveal" id="robust">
+      <div class="card c-rose">
+        <div class="shot shot-robust">
+          <span class="shot-tag">Robustness testing &middot; CAKE V.1 &middot; Jul 2024</span>
+          <ul class="rb-tests">
+            <li><b>Parameters</b><span>every input shifted &plusmn;3 steps</span><i>Pass</i></li>
+            <li><b>Price feeds</b><span>six exchanges and index data</span><i>Pass</i></li>
+            <li><b>Timeframes</b><span>re-run on neighbouring charts</span><i>Pass</i></li>
+          </ul>
+          <dl class="rb-stats">
+            <div><dt>Sortino</dt><dd>3.77</dd></div>
+            <div><dt>Sharpe</dt><dd>2.31</dd></div>
+            <div><dt>Profit factor</dt><dd>6.19</dd></div>
+            <div><dt>Max drawdown</dt><dd>39.91%</dd></div>
+          </dl>
+          <p class="rb-fail"><b>DOGE V.1</b> failed the same tests, so I rebuilt it as V.2.</p>
+        </div>
+      </div>
+      <div class="cap"><h3>Strategy Robustness Testing</h3><span>2024</span></div>
+      <p class="desc">A good backtest can be luck, so every strategy I keep has to survive three checks in Google Sheets: its results must hold when each parameter is nudged, when the price data comes from a different exchange, and when the timeframe changes. The figures above are backtested results over 33 trades, 60.61% of them profitable.</p>
+    </article>
+
+    <article class="card-wrap reveal" id="olympus">
+      <div class="card c-sand">
+        <div class="shot shot-sheet">
+          <span class="shot-tag dark">Google Sheets &middot; 9 tabs &middot; redacted for showcasing</span>
+          <div class="sh-grid" aria-hidden="true">
+            <b>Name</b><b>Cohort</b><b>Rank</b><b>Majors</b><b>Ratios</b><b>Altcoins</b><b>Memes</b><b>Omega</b>
+            <i style="--w:85%"></i><i style="--w:45%"></i><i style="--w:65%"></i><i style="--w:35%"></i><i style="--w:35%"></i><i style="--w:35%"></i><i style="--w:55%"></i><i style="--w:35%"></i><i style="--w:70%"></i><i style="--w:35%"></i><i style="--w:35%"></i><i style="--w:65%"></i><i style="--w:65%"></i><i style="--w:35%"></i><i style="--w:45%"></i><i style="--w:35%"></i><i style="--w:95%"></i><i style="--w:35%"></i><i style="--w:35%"></i><i style="--w:45%"></i><i style="--w:35%"></i><i style="--w:65%"></i><i style="--w:35%"></i><i style="--w:45%"></i><i style="--w:55%"></i><i style="--w:45%"></i><i style="--w:55%"></i><i style="--w:65%"></i><i style="--w:45%"></i><i style="--w:35%"></i><i style="--w:55%"></i><i style="--w:45%"></i><i style="--w:55%"></i><i style="--w:45%"></i><i style="--w:55%"></i><i style="--w:35%"></i><i style="--w:35%"></i><i style="--w:35%"></i><i style="--w:45%"></i><i style="--w:65%"></i><i style="--w:95%"></i><i style="--w:55%"></i><i style="--w:65%"></i><i style="--w:65%"></i><i style="--w:55%"></i><i style="--w:55%"></i><i style="--w:45%"></i><i style="--w:45%"></i><i style="--w:70%"></i><i style="--w:35%"></i><i style="--w:55%"></i><i style="--w:65%"></i><i style="--w:55%"></i><i style="--w:65%"></i><i style="--w:55%"></i><i style="--w:35%"></i><i style="--w:55%"></i><i style="--w:65%"></i><i style="--w:45%"></i><i style="--w:55%"></i><i style="--w:45%"></i><i style="--w:65%"></i><i style="--w:65%"></i><i style="--w:35%"></i><i style="--w:55%"></i><i style="--w:55%"></i><i style="--w:55%"></i><i style="--w:55%"></i><i style="--w:65%"></i><i style="--w:65%"></i><i style="--w:35%"></i><i style="--w:35%"></i>
+          </div>
+          <p class="sh-stamp">Redacted for showcasing</p>
+          <ul class="sh-tabs" aria-label="Sheet tabs"><li class="on">Indicators</li><li>Indicator ranking</li><li>Strategies</li><li>Strategy ranking</li><li>Data / Filters</li><li>Valuation</li></ul>
+        </div>
+      </div>
+      <div class="cap"><h3>Project Olympus</h3><span>2024 &ndash; 2025</span></div>
+      <p class="desc">A research database in Google Sheets that I built with a group of other strategy developers. It catalogues more than 250 indicators and about 100 strategies, scores each one on the same metrics across four asset groups, and rolls those scores into weighted rankings with filter views. Every name, figure, and link is redacted for showcasing because the sheet holds private work, mine included.</p>
+    </article>
+
     <article class="card-wrap reveal" id="quillton">
       <div class="card c-plum">
         <div class="shot shot-quill">
@@ -127,6 +189,21 @@
       </div>
       <div class="cap"><h3>Quillton</h3><span>Oct 2026 &ndash; Present</span></div>
       <p class="desc">A Mac app, in progress, that rewrites AI-generated text so it reads as human-written and passes AI detectors. I fine-tuned Qwen3-8B with LoRA and Direct Preference Optimization, built training datasets from thousands of human-written texts filtered by style statistics and NLI fact checks, and benchmarked each model on held-out essays for detector scores, invented facts, and readability. The best model hit 100% on some essays.</p>
+    </article>
+
+    <article class="card-wrap reveal" id="laststop">
+      <div class="card c-dusk">
+        <div class="shot shot-game">
+          <span class="shot-tag">Co-op survival road trip &middot; 2 to 6 players</span>
+          <a class="rerun go" href="https://github.com/Koregelos/laststop-builds/releases" target="_blank" rel="noopener" aria-label="Last Stop playtest builds on GitHub (opens in a new tab)">Play &nearr;</a>
+          <p class="gm-name">Last Stop</p>
+          <p class="gm-line">Scavenge by day. Survive the road at night.</p>
+          <ul class="gm-chips"><li>Unity 6</li><li>Online multiplayer</li><li>Steam invites</li><li>Procedural world</li><li>Windows and Mac</li></ul>
+          <span class="gm-road" aria-hidden="true"></span>
+        </div>
+      </div>
+      <div class="cap"><h3>Last Stop</h3><span>Sep &ndash; Nov 2026</span></div>
+      <p class="desc">A first-person co-op game I designed and built in Unity. You start with a bare chassis you push by hand, scavenge a procedurally generated roadside for scrap, and trade it for parts until the wreck is a rolling base. I shipped 11 playtest builds in five weeks, tuning enemy spawns, difficulty, and prices after each session with friends.</p>
     </article>
 
     <article class="card-wrap reveal" id="business">
@@ -143,13 +220,20 @@
         </div>
       </div>
       <div class="cap"><h3>Christian Anthony Investments LLC</h3><span>Jan 2023 &ndash; Dec 2024</span></div>
-      <p class="desc">A resale business I founded and funded with cryptocurrency. I automated cryptocurrency gift card arbitrage in Python and analyzed fees, margins, and profitability to guide business decisions.</p>
+      <p class="desc">A resale business I founded and funded with cryptocurrency, registered as a California LLC in August 2023. I automated cryptocurrency gift card arbitrage in Python and analyzed fees, margins, and profitability to guide business decisions.</p>
     </article>
 
-    <!-- PLACEHOLDERS: when a new project is ready, copy one of the cards above into this spot. -->
-    <div class="ghosts reveal">
-      <div class="card ghost"><div class="ghost-in"><i>+</i><b>Next project</b><span>In progress</span></div></div>
-      <div class="card ghost"><div class="ghost-in"><i>+</i><b>Next project</b><span>In progress</span></div></div>
+    <div class="minis reveal">
+      <article class="mini" id="weights">
+        <span class="mini-tag">Google Sheets &middot; Jul 2024</span>
+        <h3>Portfolio weighting model</h3>
+        <p>Splits capital across five strategies using the average of an Omega-ratio optimisation and a risk-parity optimisation, with daily tracking and a monthly rebalance. A 17-indicator trend score sits beside it, and I wrote down why each indicator earned its place.</p>
+      </article>
+      <article class="mini" id="pricing">
+        <span class="mini-tag">Survey design &middot; 2024</span>
+        <h3>Price sensitivity survey</h3>
+        <p>To price an AI chatbot service for gyms, I ran a Van Westendorp survey: eight questions on one-time and monthly pricing, with answers flagged when they skewed the quartiles. The sample was small, six people, whose names are redacted for showcasing.</p>
+      </article>
     </div>
   </div>
 </section>
@@ -165,6 +249,15 @@
         <li>Consistently met speed and order accuracy goals in a high-volume department.</li>
         <li>Trained multiple associates on picking, order accuracy, and customer handoff while communicating procedures clearly to support consistent team performance.</li>
         <li>Recognized as eligible for promotion based on performance and demonstrated leadership.</li>
+      </ul>
+    </article>
+    <article class="row reveal">
+      <div class="cap"><h3>Handshake AI</h3><span>Contract</span></div>
+      <p class="role">AI Model Training</p>
+      <ul>
+        <li>Evaluated AI model responses against written rubrics and corrected them, which takes the same habits as checking any model: precision, consistency, and a stated reason for every judgment.</li>
+        <li>Wrote and reviewed prompts built to expose reasoning errors, which gave me a practical sense of where language models fail and how to verify their output before relying on it.</li>
+        <li>Project details are withheld for confidentiality.</li>
       </ul>
     </article>
     <article class="row reveal">
