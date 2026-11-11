@@ -77,8 +77,7 @@
     }
     var bell = [], n, x; for (n = 0; n < 9; n++) { x = (n - 4) / 4 * 2.4; bell.push([Math.round(188 + n * 29), Math.round(404 - 116 * Math.exp(-x * x / 2))]); }
     var chain = []; for (n = 0; n < 8; n++) chain.push([n, n + 1]);
-    el.innerHTML = fig(bell, chain, 'N(\u03bc, \u03c3\u00b2)', 304, 432) +
-      fig([[1452, 118], [1352, 118], [1408, 186], [1350, 256], [1456, 256]], [[0, 1], [1, 2], [2, 3], [3, 4]], '\u03a3', 1478, 262) +
+    el.innerHTML = fig([[1452, 118], [1352, 118], [1408, 186], [1350, 256], [1456, 256]], [[0, 1], [1, 2], [2, 3], [3, 4]], '\u03a3', 1478, 262) +
       fig([[1240, 318], [1296, 318], [1268, 346], [1240, 374], [1296, 374]], [[0, 1], [1, 4], [4, 3], [3, 0]], '', 0, 0);
   })();
 
@@ -189,6 +188,7 @@
   var heap = document.getElementById('heap');
   var heapStep = 0;
   function buildHeap() {
+    if (!heap) return;
     var r = rng(2028), bins = [1, 2, 4, 6, 9, 11, 12, 11, 9, 6, 4, 2, 1];
     // fit the whole figure, heading and caption on one screen, whatever its size
     var avail = Math.min(window.innerWidth - 40, 540), room = window.innerHeight - 300;
@@ -222,9 +222,9 @@
     if (window.innerWidth === heapW && Math.abs(window.innerHeight - heapH) < 140) return;
     heapW = window.innerWidth; heapH = window.innerHeight; clearTimeout(heapT); heapT = setTimeout(buildHeap, 200);
   });
-  if ('IntersectionObserver' in window) new IntersectionObserver(function (en) { heap.classList.toggle('live', en[0].isIntersecting); }, { rootMargin: '80px' }).observe(heap);
-  else heap.classList.add('live');
+  if (heap) { if ('IntersectionObserver' in window) new IntersectionObserver(function (en) { heap.classList.toggle('live', en[0].isIntersecting); }, { rootMargin: '80px' }).observe(heap); else heap.classList.add('live'); }
   function armHeap() {
+    if (!heap) return;
     if (reduce || !('IntersectionObserver' in window)) { heap.classList.add('in'); return; }
     var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { heap.classList.add('in'); io.disconnect(); } }, { threshold: .35 });
     io.observe(heap);
