@@ -191,49 +191,21 @@
     <article class="card-wrap reveal" id="laststop">
       <div class="card c-dusk">
         <div class="shot shot-ls">
-          <div class="ls-art" role="img" aria-label="The player character from Last Stop standing by the road, as day turns to night">
+          <div class="ls-art" role="img" aria-label="The player character from Last Stop, a figure in a blue suit with a smiling orange face, on a yellow patterned wallpaper">
             <svg viewBox="0 0 600 340" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
               <defs>
-                <linearGradient id="ls-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb36b"/><stop offset=".55" stop-color="#ffd9a0"/><stop offset="1" stop-color="#ffe9c4"/></linearGradient>
-                <linearGradient id="ls-nsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b0a24"/><stop offset=".7" stop-color="#2a1b4d"/><stop offset="1" stop-color="#4a2a5e"/></linearGradient>
-                <linearGradient id="ls-beam" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffe9a8" stop-opacity=".85"/><stop offset="1" stop-color="#ffe9a8" stop-opacity="0"/></linearGradient>
+                <pattern id="ls-wp" width="84" height="84" patternUnits="userSpaceOnUse" patternTransform="rotate(-12)">
+                  <g fill="none" stroke="#e39a1f" stroke-width="2.4" stroke-linecap="round">
+                    <circle cx="21" cy="21" r="11"/><path d="M16.5 23.5 Q21 28 25.5 23.5"/>
+                  </g>
+                  <g fill="#e39a1f"><circle cx="17.5" cy="18" r="1.5"/><circle cx="24.5" cy="18" r="1.5"/><circle cx="63" cy="21" r="2.6"/><circle cx="21" cy="63" r="2.6"/></g>
+                  <path d="M63 53 l2.8 6.4 6.9 .7 -5.2 4.6 1.5 6.8 -6 -3.5 -6 3.5 1.5 -6.8 -5.2 -4.6 6.9 -.7z" fill="#ffd778"/>
+                </pattern>
+                <radialGradient id="ls-glow" cx=".5" cy=".5" r=".6"><stop offset="0" stop-color="#ffd45f"/><stop offset="1" stop-color="#f1ae2e"/></radialGradient>
               </defs>
-              <rect width="600" height="340" fill="url(#ls-sky)"/>
-              <circle cx="398" cy="52" r="24" fill="#fff3c9"/>
-              <path d="M0 190 L70 120 L120 165 L180 100 L250 170 L330 110 L400 172 L470 128 L540 176 L600 140 L600 240 L0 240Z" fill="#e9a27a" opacity=".55"/>
-              <!-- meadows -->
-              <path d="M0 215 Q60 170 120 196 T210 200 L210 262 L0 262Z" fill="#8fce6a"/>
-              <g fill="#fff"><circle cx="38" cy="222" r="2.2"/><circle cx="74" cy="212" r="2.2"/><circle cx="112" cy="226" r="2.2"/><circle cx="150" cy="214" r="2.2"/></g>
-              <g fill="#ffd34d"><circle cx="56" cy="230" r="2"/><circle cx="96" cy="220" r="2"/><circle cx="134" cy="232" r="2"/><circle cx="178" cy="222" r="2"/></g>
-              <!-- farmland -->
-              <path d="M200 204 Q260 186 320 196 T410 200 L410 262 L200 262Z" fill="#d8c25a"/>
-              <g stroke="#b99e3c" stroke-width="2"><path d="M214 262 L250 200"/><path d="M250 262 L276 198"/><path d="M290 262 L304 196"/><path d="M330 262 L332 197"/><path d="M370 262 L360 198"/></g>
-              <rect x="296" y="156" width="44" height="40" fill="#c94f3d"/><path d="M290 158 L318 134 L346 158Z" fill="#8e2f27"/><rect x="311" y="174" width="14" height="22" fill="#f6e7cf"/>
-              <rect x="350" y="146" width="16" height="50" rx="3" fill="#6d8fb8"/><path d="M350 148 Q358 134 366 148Z" fill="#48658a"/>
-              <!-- forest -->
-              <path d="M400 202 Q470 180 540 192 T600 190 L600 262 L400 262Z" fill="#3f8a57"/>
-              <g fill="#235c3c"><path d="M430 200 L444 150 L458 200Z"/><path d="M462 204 L480 138 L498 204Z"/><path d="M506 200 L522 146 L538 200Z"/><path d="M546 204 L564 132 L582 204Z"/><path d="M578 200 L592 152 L606 200Z"/></g>
-              <g fill="#2f7349"><path d="M446 214 L458 172 L470 214Z"/><path d="M492 216 L506 166 L520 216Z"/><path d="M534 214 L548 170 L562 214Z"/></g>
-              <!-- night layer -->
-              <g class="ls-n">
-                <rect width="600" height="262" fill="url(#ls-nsky)" opacity=".93"/>
-                <g fill="#fff"><circle cx="40" cy="40" r="1.3"/><circle cx="110" cy="72" r="1"/><circle cx="170" cy="30" r="1.4"/><circle cx="240" cy="58" r="1"/><circle cx="300" cy="24" r="1.2"/><circle cx="372" cy="66" r="1"/><circle cx="420" cy="34" r="1.3"/><circle cx="540" cy="52" r="1.1"/><circle cx="575" cy="24" r="1.3"/><circle cx="80" cy="110" r="1"/><circle cx="520" cy="104" r="1"/></g>
-                <circle cx="398" cy="52" r="18" fill="#f3efe2"/><circle cx="406" cy="47" r="16.5" fill="#15102f"/>
-                <rect x="311" y="174" width="14" height="22" fill="#ffd27a"/>
-                <g fill="#ffd27a"><circle cx="486" cy="190" r="2.2"/><circle cx="494" cy="190" r="2.2"/></g>
-              </g>
-              <!-- road -->
-              <rect y="262" width="600" height="78" fill="#2b2733"/>
-              <rect y="262" width="600" height="5" fill="#c9b58e"/>
-              <g class="ls-dash" fill="#ffd27a"><rect x="0" y="298" width="46" height="5"/><rect x="92" y="298" width="46" height="5"/><rect x="184" y="298" width="46" height="5"/><rect x="276" y="298" width="46" height="5"/><rect x="368" y="298" width="46" height="5"/><rect x="460" y="298" width="46" height="5"/><rect x="552" y="298" width="46" height="5"/><rect x="644" y="298" width="46" height="5"/></g>
-              <!-- the car you build -->
-              <g transform="translate(-60 96) scale(.62)"><g class="ls-car">
-                <path class="ls-n" d="M214 282 L330 268 L330 300 Z" fill="url(#ls-beam)"/>
-                <rect x="150" y="270" width="64" height="16" rx="4" fill="#e2573f"/><path d="M162 270 L172 256 L198 256 L206 270Z" fill="#b83d2c"/><path d="M174 268 L178 259 L194 259 L199 268Z" fill="#bfe3f2"/>
-                <rect x="140" y="262" width="14" height="10" fill="#8a6a45"/><rect x="143" y="254" width="9" height="9" fill="#a8845a"/>
-                <circle cx="166" cy="288" r="8" fill="#17131c"/><circle cx="166" cy="288" r="3" fill="#8d8a94"/><circle cx="200" cy="288" r="8" fill="#17131c"/><circle cx="200" cy="288" r="3" fill="#8d8a94"/>
-                <circle cx="213" cy="279" r="2.4" fill="#fff3c9"/>
-              </g></g>
+              <rect width="600" height="340" fill="url(#ls-glow)"/>
+              <rect width="600" height="340" fill="url(#ls-wp)"/>
+              <ellipse cx="300" cy="322" rx="74" ry="9" fill="#b9770f" opacity=".45"/>
             </svg>
             <img class="ls-char" src="img/laststop-player.png" alt="" width="161" height="560" loading="lazy" decoding="async">
           </div>

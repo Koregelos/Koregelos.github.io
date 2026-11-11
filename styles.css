@@ -884,3 +884,8 @@ html.js .block-head.reveal:not(.seen) .bh-line path { stroke-dashoffset: 1; }
 html.js .block-head.reveal:not(.seen) .aside { opacity: 0; }
 @media (prefers-reduced-motion: reduce) { .bh-no, .block-head h2 span, .bh-line path, .block-head .aside { transition: none; } }
 @media print { .bh-line, .bh-no { display: none; } }
+
+/* Last Stop: plain wallpaper cover */
+.shot-ls .ls-art::after { background: none; }
+.ls-art img.ls-char { inset: auto auto 4% 50%; right: auto; margin-left: 0; height: 86%; translate: -50% 0; filter: drop-shadow(0 5px 4px rgba(120, 70, 0, .35)); }
+@media (max-width: 560px) { .ls-art img.ls-char { right: auto; } }
