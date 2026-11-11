@@ -1049,3 +1049,4 @@ html.js .reveal:not(.seen) .qd-tool { transform: translateY(18px) scale(.97); op
 .foot-in { flex-wrap: wrap; gap: 10px 22px; }
 .foot-links { gap: 10px 20px; }
 @media (max-width: 700px) { .foot-in { justify-content: flex-start; } .foot-in .sig-small { flex: 1 1 100%; } .foot-links { flex: 1 1 100%; justify-content: flex-start; } }
+.foot-links a + a { margin-left: 0 !important; }
