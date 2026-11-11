@@ -460,3 +460,19 @@
   });
   function armNav() { layRail(); ask(); }
 })();
+
+/* Project Olympus: switch between sheet tabs */
+(function () {
+  var tabs = document.querySelectorAll('.sh-tabs button');
+  Array.prototype.forEach.call(tabs, function (b) {
+    b.addEventListener('click', function () {
+      Array.prototype.forEach.call(tabs, function (o) {
+        var on = o === b;
+        o.classList.toggle('on', on);
+        o.setAttribute('aria-pressed', on ? 'true' : 'false');
+        var t = document.getElementById(o.getAttribute('data-view'));
+        if (t) t.hidden = !on;
+      });
+    });
+  });
+})();
