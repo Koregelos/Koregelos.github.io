@@ -643,14 +643,186 @@
   }
 
   // Quillton: click the screenshot to see it full size
-  var pic = document.querySelector('.ql-win picture');
-  if (pic && window.HTMLDialogElement) {
-    var dlg = document.createElement('dialog'); dlg.className = 'ql-zoom'; dlg.setAttribute('aria-label', 'Quillton screenshot, full size');
-    dlg.innerHTML = '<img src="img/quillton.jpg" alt="The Quillton app rewriting a stiff AI draft into natural writing">';
+  var see = document.querySelector('.ql-see');
+  if (see && window.HTMLDialogElement) {
+    var dlg = document.createElement('dialog'); dlg.className = 'ql-zoom'; dlg.setAttribute('aria-label', 'Quillton app screenshot');
+    dlg.innerHTML = '<img src="img/quillton.jpg" alt="The Quillton app rewriting a stiff AI draft into natural writing, with four versions written at once" loading="lazy">';
     document.body.appendChild(dlg);
-    pic.setAttribute('role', 'button'); pic.setAttribute('tabindex', '0'); pic.setAttribute('aria-label', 'Enlarge the Quillton screenshot');
-    var open = function () { dlg.showModal(); };
-    pic.addEventListener('click', open); pic.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+    see.addEventListener('click', function () { dlg.showModal(); });
     dlg.addEventListener('click', function () { dlg.close(); });
   }
+})();
+
+/* Quillton card: the rewrite demo from the Quillton website */
+(function () {
+  "use strict";
+  var tool = document.querySelector("[data-tool]");
+  if (tool) {
+    var samples = [{"after": "We've finished moving everyone over to the new billing system. Managing your account should feel quicker now. If anything feels slow or broken, tell us. We'd rather hear it.", "before": "We are thrilled to announce that our team has successfully completed the migration to the new billing system. This seamless transition will empower customers to manage their accounts more efficiently. Moving forward, we remain committed to delivering an exceptional experience.", "parts": [{"t": "We"}, {"n": "'ve finished", "o": " are thrilled to announce that our team has successfully completed"}, {"t": " "}, {"n": "moving everyone over", "o": "the migration"}, {"t": " to the new billing system. "}, {"n": "Managing your account should feel quicker now.", "o": "This seamless transition will empower customers to manage their accounts more efficiently."}, {"t": " "}, {"n": "If anything feels slow or broken, tell us. We'd rather hear it.", "o": "Moving forward, we remain committed to delivering an exceptional experience."}]}, {"after": "I'm writing about the Operations Coordinator role at Brightline Logistics. I've spent five years in jobs where the schedule changes by the hour, and that seems to be most of what this role is.", "before": "I hope this email finds you well. I am reaching out to express my genuine interest in the Operations Coordinator role at Brightline Logistics. With over five years of experience in fast-paced environments, I am confident that I would be a valuable asset to your team.", "parts": [{"n": "I'm writing about", "o": "I hope this email finds you well. I am reaching out to express my genuine interest in"}, {"t": " the Operations Coordinator role at Brightline Logistics. "}, {"n": "I've spent", "o": "With over"}, {"t": " five years "}, {"n": "in jobs where the schedule changes by the hour", "o": "of experience in fast-paced environments"}, {"t": ", "}, {"n": "and that seems to be most of what this role is.", "o": "I am confident that I would be a valuable asset to your team."}]}, {"after": "Some news: I've joined Northwind as Head of Partnerships. I'll spend most of my days with the people we build things with. Thanks to everyone who helped me get here.", "before": "I'm thrilled to share that after an incredible journey, I've officially joined Northwind as Head of Partnerships! This new chapter represents a unique opportunity to leverage my passion for building meaningful relationships. I am deeply grateful to everyone who has supported me along the way.", "parts": [{"n": "Some news: I've", "o": "I'm thrilled to share that after an incredible journey, I've officially"}, {"t": " joined Northwind as Head of Partnerships"}, {"n": ".", "o": "!"}, {"t": " "}, {"n": "I'll spend most of my days with the people we build things with.", "o": "This new chapter represents a unique opportunity to leverage my passion for building meaningful relationships."}, {"t": " "}, {"n": "Thanks to", "o": "I am deeply grateful to"}, {"t": " everyone who "}, {"n": "helped me get here.", "o": "has supported me along the way."}]}, {"after": "Finding good coffee shouldn't be hard. At Ridgeline Roasters we roast beans we'd drink ourselves, bought straight from farms we know.", "before": "In today's fast-paced world, finding the perfect coffee can be a daunting task. At Ridgeline Roasters, we are passionate about delivering exceptional, ethically sourced beans that elevate your daily routine.", "parts": [{"n": "Finding good", "o": "In today's fast-paced world, finding the perfect"}, {"t": " coffee "}, {"n": "shouldn't be hard", "o": "can be a daunting task"}, {"t": ". "}, {"n": "At Ridgeline Roasters we roast beans we'd drink ourselves, bought straight from farms we know.", "o": "At Ridgeline Roasters, we are passionate about delivering exceptional, ethically sourced beans that elevate your daily routine."}]}];
+    var still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var live = tool.querySelector("[data-live]");
+    var scan = tool.querySelector(".qd-scan");
+    var status = tool.querySelector("[data-status]");
+    var statusText = tool.querySelector("[data-status-text]");
+    var meter = tool.querySelector("[data-meter]");
+    var knob = tool.querySelector("[data-knob]");
+    var meterWord = tool.querySelector("[data-meter-word]");
+    var tally = tool.querySelector("[data-tally]");
+    var words = function (t) { return (t.match(/\S+/g) || []).length; };
+    var setStatus = function (state, text) { status.className = "qd-status" + (state ? " qd-is-" + state : ""); statusText.textContent = text; };
+
+    // One clock for every step, which stands still while the pointer rests on the box
+    // (and, through requestAnimationFrame, while the tab is hidden).
+    var held = false;
+    tool.addEventListener("mouseenter", function () { held = true; });
+    tool.addEventListener("mouseleave", function () { held = false; });
+    var wait = function (ms, onFrame) {
+      return new Promise(function (done) {
+        var spent = 0;
+        var last = null;
+        var frame = function (t) {
+          if (last !== null && !held) spent += Math.min(t - last, 50);
+          last = t;
+          var p = Math.min(spent / ms, 1);
+          if (onFrame) onFrame(p, spent);
+          if (p >= 1) done(); else requestAnimationFrame(frame);
+        };
+        requestAnimationFrame(frame);
+      });
+    };
+    var ease = function (p) { return p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2; };
+
+    // From AI to human: the meter, its colour, the line under the header and the glow
+    // around the box all move together, from an alarming red to a calm green.
+    var setMeter = function (f) {
+      var hue = Math.round(162 * f);
+      tool.style.setProperty("--tone", "hsl(" + hue + " " + Math.round(80 - 38 * f) + "% " + Math.round(50 - 12 * f) + "%)");
+      tool.style.boxShadow = "0 1px 2px rgba(20, 24, 50, .04), 0 14px 48px -14px hsla(" + hue + ", " + Math.round(85 - 40 * f) + "%, 48%, " + (.22 - .06 * f).toFixed(2) + ")";
+      meter.style.width = (f * 100) + "%";
+      knob.style.left = (f * 100) + "%";
+      meterWord.textContent = f >= 1 ? "Reads human" : f >= .6 ? "Mostly human" : f > .2 ? "Getting there" : "Sounds like AI";
+    };
+    var setTally = function (s, done, total) {
+      var now = words(live.textContent);
+      tally.innerHTML = "";
+      if (!done) { tally.textContent = total + " stiff phrases found"; return; }
+      var b = document.createElement("b");
+      b.textContent = done + " of " + total;
+      tally.append(b, " phrases rewritten · " + words(s.before) + " → " + now + " words");
+    };
+
+    // The old phrase is struck through and fades back, then the new one writes itself in
+    // word by word at a steady 8 words a second, easy to follow, each word settling in as it lands.
+    var morph = async function (span, from, to, onWord) {
+      span.classList.add("qd-out");
+      await wait(Math.min(Math.max(260 + 2 * from.length, 320), 480));
+      span.classList.remove("qd-out");
+      span.textContent = "";
+      var caret = document.createElement("span");
+      caret.className = "qd-caret";
+      span.append(caret);
+      var parts = to.split(/(\s+)/);
+      var started = performance.now();
+      var written = 0;
+      var due = 0;
+      for (var i = 0; i < parts.length; i++) {
+        if (!parts[i]) continue;
+        if (!parts[i].trim()) { span.insertBefore(document.createTextNode(parts[i]), caret); continue; }
+        var w = document.createElement("span");
+        w.className = "qd-w";
+        w.textContent = parts[i];
+        span.insertBefore(w, caret);
+        written++;
+        if (onWord) onWord(written / Math.max(1, words(to)));
+        // Keep to the pace on average, even when frames come late.
+        due += (1000 / 8) * (.8 + Math.random() * .4);
+        var lag = due - (performance.now() - started);
+        if (lag > 8) await wait(lag);
+      }
+      await wait(120);
+      span.textContent = to;
+    };
+
+    var build = function (s) {
+      live.textContent = "";
+      var edits = [];
+      s.parts.forEach(function (part) {
+        if (part.t !== undefined) { live.append(part.t); return; }
+        // A space both sides share stays outside the highlight.
+        var o = part.o, n = part.n, lead = "", trail = "";
+        if (o.charAt(0) === " " && n.charAt(0) === " ") { lead = " "; o = o.slice(1); n = n.slice(1); }
+        if (o.slice(-1) === " " && n.slice(-1) === " ") { trail = " "; o = o.slice(0, -1); n = n.slice(0, -1); }
+        var span = document.createElement("span");
+        span.className = "qd-chg";
+        span.textContent = o;
+        live.append(lead, span, trail);
+        edits.push({ span: span, from: o, to: n });
+      });
+      return edits;
+    };
+
+    var play = async function (s) {
+      setMeter(0);
+      var edits = build(s);
+      setTally(s, 0, edits.length);
+      setStatus("", "Ready");
+      // The new text rises in from below as the last one drifts away.
+      live.classList.add("qd-enter");
+      live.classList.remove("qd-away");
+      void live.offsetWidth;
+      live.classList.remove("qd-enter");
+
+      if (still) {
+        live.textContent = s.after;
+        setMeter(1);
+        setTally(s, edits.length, edits.length);
+        setStatus("done", "Humanized");
+        await wait(6000);
+        return;
+      }
+
+      // Read the text: a sweep across it, picking out the stiff phrases as it goes.
+      await wait(250);
+      setStatus("reading", "Reading");
+      scan.classList.remove("qd-go");
+      void scan.offsetWidth;
+      scan.classList.add("qd-go");
+      var box = live.getBoundingClientRect();
+      edits.forEach(function (ed) {
+        var r = ed.span.getBoundingClientRect();
+        var at = Math.max(0, (r.left - box.left) / box.width);
+        setTimeout(function () { ed.span.classList.add("qd-flag"); }, 150 + at * 750);
+      });
+      await wait(1200);
+
+      // Rewrite them one at a time, in place.
+      for (var i = 0; i < edits.length; i++) {
+        var ed = edits[i];
+        setStatus("working", "Rewriting " + (i + 1) + " of " + edits.length);
+        ed.span.classList.add("qd-active");
+        await wait(180);
+        await morph(ed.span, ed.from, ed.to, (function (k) {
+          return function (part) { setMeter((k + part) / edits.length); };
+        })(i));
+        ed.span.classList.remove("qd-flag", "qd-active");
+        ed.span.classList.add("qd-fresh");
+        setMeter((i + 1) / edits.length);
+        setTally(s, i + 1, edits.length);
+        (function (span) {
+          wait(450).then(function () { span.classList.add("qd-calm"); span.classList.remove("qd-fresh"); });
+        })(ed.span);
+          await wait(260);
+      }
+      setStatus("done", "Humanized");
+
+      // Time to read the result before the next one.
+      await wait(3600);
+      live.classList.add("qd-away");
+      await wait(500);
+    };
+
+    var run = function () { (async function () { for (var n = 0; ; n = (n + 1) % samples.length) await play(samples[n]); })(); };
+    if ("IntersectionObserver" in window) { var qio = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { qio.disconnect(); run(); } }, { threshold: .35 }); qio.observe(tool); } else run();
+  }
+
 })();
