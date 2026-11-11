@@ -546,3 +546,29 @@
     io2.observe(grid);
   } else load();
 })();
+
+/* Pricing card: drag the price, see which surveyed owners stay (their real answers: too cheap below, too expensive above) */
+(function () {
+  var range = document.getElementById('pr-range'); if (!range) return;
+  var R = [[40, 300], [200, 3000], [15, 45], [30, 200], [0, 100], [50, 250]];
+  var dots = document.getElementById('pr-dots').children, n = document.getElementById('pr-n'), pe = document.getElementById('pr-p'), re = document.getElementById('pr-r'), best = document.getElementById('pr-best');
+  var LO = Math.log(10), HI = Math.log(400), touched = false;
+  function price(v) { var p = Math.exp(LO + (HI - LO) * v / 100); return p < 100 ? Math.round(p / 5) * 5 : Math.round(p / 10) * 10; }
+  function buyers(p) { var c = 0; for (var i = 0; i < R.length; i++) { var ok = p >= R[i][0] && p <= R[i][1]; dots[i].classList.toggle('off', !ok); if (ok) c++; } return c; }
+  function show() {
+    var p = price(+range.value), c = buyers(p);
+    n.textContent = c + ' of 6'; pe.textContent = '$' + p; re.textContent = '$' + (p * c).toLocaleString('en-US');
+    best.classList.toggle('on', p * c >= 800); range.setAttribute('aria-valuetext', '$' + p + ' a month, ' + c + ' of 6 would pay');
+  }
+  range.addEventListener('input', function () { touched = true; show(); });
+  ['pointerdown', 'keydown', 'touchstart'].forEach(function (e) { range.addEventListener(e, function () { touched = true; }, { passive: true }); });
+  show();
+  var card = document.getElementById('pricing');
+  if ('IntersectionObserver' in window && !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+    var io = new IntersectionObserver(function (en) {
+      if (!en[0].isIntersecting) return; io.disconnect();
+      var t0 = null; (function f(ts) { if (touched) return; if (t0 === null) t0 = ts; var k = Math.min(1, (ts - t0) / 2600), e = 1 - Math.pow(1 - k, 3); range.value = Math.round(8 + (81 - 8) * e); show(); if (k < 1) requestAnimationFrame(f); })(performance.now());
+    }, { threshold: .6 });
+    io.observe(card);
+  }
+})();

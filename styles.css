@@ -825,3 +825,20 @@ html.js .reveal:not(.seen) .fw-l { opacity: 0; }
 .shot-robust .vs-h { line-height: 1.4; }
 @media (max-width: 560px) { .fw figcaption span:nth-child(2) { display: none; } .fw svg { height: 116px; } }
 @media (prefers-reduced-motion: reduce) { .fw polyline, .fw-l { transition: none; } }
+
+/* pricing card you can drag */
+.minis.one { grid-template-columns: 1fr; }
+.pr { padding: 2px 0 0; }
+.pr-read { font: 500 19px/1.3 var(--serif) !important; color: var(--ink); }
+.pr-read b { color: #8be0a4; font-weight: 500; font-variant-numeric: tabular-nums; }
+.pr-dots { display: flex; gap: 8px; margin: 12px 0 10px; }
+.pr-dots i { width: 30px; height: 30px; border-radius: 50%; background: #5fd08c; position: relative; transition: background .25s ease, transform .25s ease, opacity .25s ease; }
+.pr-dots i::after { content: ""; position: absolute; left: 50%; top: 22%; width: 34%; height: 34%; margin-left: -17%; border-radius: 50%; background: rgba(14, 12, 36, .55); box-shadow: 0 13px 0 4px rgba(14, 12, 36, .55); clip-path: inset(0 -10px -9px -10px); }
+.pr-dots i.off { background: #4a4770; transform: scale(.82); opacity: .6; }
+.pr-slide { display: block; }
+.pr-slide input { width: 100%; height: 28px; margin: 0; accent-color: #8be0a4; cursor: pointer; background: none; }
+.pr-ax { display: flex; justify-content: space-between; font: 500 10px var(--mono); color: var(--muted); }
+.pr-rev { font: 500 12px var(--mono) !important; color: var(--text); margin-top: 10px; }
+.pr-rev b { color: var(--ink); font-weight: 500; font-variant-numeric: tabular-nums; }
+#pr-best { margin-left: 8px; padding: 2px 7px; border-radius: 999px; background: rgba(139, 224, 164, .16); color: #8be0a4; opacity: 0; transition: opacity .25s ease; }
+#pr-best.on { opacity: 1; }
