@@ -1039,3 +1039,8 @@ html.js .reveal:not(.seen) .qd-tool { transform: translateY(18px) scale(.97); op
 .qd-tool .qd-sheet { font-size: 14.5px; line-height: 1.6; padding: 14px 16px 16px; }
 .ql-foot { margin: 6px 0 12px; }
 @media (max-width: 560px) { .qd-tool .qd-sheet { font-size: 13px; line-height: 1.55; padding: 12px 12px 12px; } .qd-tool .qd-tool-head { padding: 8px 12px; } .qd-tool .qd-tool-foot { padding: 8px 12px; } .ql-foot { margin: 2px 0 10px; } .shot-ql { padding-top: 40px; } }
+
+.foot-links { display: inline-flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.foot-links a { display: inline-flex; align-items: center; gap: 6px; }
+.foot-in .linkish { white-space: nowrap; }
+@media (max-width: 560px) { .foot-links { flex: 1 1 100%; justify-content: space-between; gap: 12px; } }
