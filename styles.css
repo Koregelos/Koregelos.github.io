@@ -896,3 +896,42 @@ html.js .block-head.reveal:not(.seen) .aside { opacity: 0; }
 .cards > .card-wrap::before { content: "Project " counter(proj, decimal-leading-zero) " / 07"; display: flex; align-items: center; gap: 14px; margin: 0 0 18px; font: 500 10.5px var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--ink); opacity: .78; white-space: nowrap; }
 .cards > .card-wrap + .card-wrap { margin-top: 56px; padding-top: 30px; border-top: 1px solid rgba(255, 255, 255, .16); }
 @media (max-width: 560px) { .cards > .card-wrap + .card-wrap { margin-top: 40px; padding-top: 24px; } }
+
+/* interactive round: chart scrubbing, bar readout, poke, lightbox */
+.fw-plot { cursor: crosshair; touch-action: pan-y; }
+.fw-x { position: absolute; top: -4px; bottom: -4px; width: 1px; background: rgba(255, 255, 255, .55); pointer-events: none; opacity: 0; }
+.fw-dot { position: absolute; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; border: 2px solid #0b101c; pointer-events: none; opacity: 0; }
+.fw-dot.d-me { background: #8be0a4; } .fw-dot.d-b { background: #f08a6c; }
+.fw-tip { position: absolute; bottom: 100%; margin-bottom: 8px; transform: translateX(-50%); font: 500 10.5px var(--mono); color: #f2efe9; background: #0b101c; border: 1px solid rgba(255, 255, 255, .25); border-radius: 6px; padding: 4px 8px; white-space: nowrap; pointer-events: none; opacity: 0; z-index: 3; }
+.fw-tip b { color: #fff; font-weight: 600; margin-right: 8px; } .fw-tip .g { color: #8be0a4; } .fw-tip .r { color: #f6a58c; }
+.fw-plot.scrub .fw-x, .fw-plot.scrub .fw-dot, .fw-plot.scrub .fw-tip { opacity: 1; }
+.fw-plot.scrub .fw-l { opacity: 0 !important; transition: none; }
+.fw-hint { position: absolute; left: 0; bottom: 2px; font: 500 9.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: rgba(255, 255, 255, .55); pointer-events: none; transition: opacity .4s ease; }
+.fw-plot.used .fw-hint { opacity: 0; }
+
+.biz-col { cursor: pointer; outline: none; transition: opacity .25s ease; }
+.biz-chart.pick .biz-col:not(.on) { opacity: .4; }
+.biz-col:focus-visible i { box-shadow: 0 0 0 2px #fff; }
+.biz-key { min-height: 15px; }
+.biz-key .biz-read b { color: #fff; font-weight: 600; } .biz-key .biz-read .g { color: #6fdc9b; }
+
+.ls-poke { position: absolute; inset: 0; z-index: 1; background: none; border: 0; padding: 0; cursor: pointer; }
+.ls-poke:focus-visible { outline: 2px solid #17111f; outline-offset: -6px; }
+.ls-say { position: absolute; left: calc(50% + 46px); top: 16%; z-index: 1; max-width: 42%; font: 600 13px/1.25 var(--sans, inherit); color: #17111f; background: #fff; border-radius: 12px 12px 12px 3px; padding: 7px 11px; box-shadow: 0 3px 0 rgba(120, 70, 0, .35); pointer-events: none; transform-origin: 0 100%; }
+.ls-say.pop { animation: lssay .35s cubic-bezier(.2, 1.5, .4, 1); }
+@keyframes lssay { from { transform: scale(.5); opacity: 0; } }
+.ls-art img.ls-char.hop { animation: lshop .5s cubic-bezier(.3, 0, .4, 1); }
+@keyframes lshop { 0% { transform: none; } 20% { transform: scale(1.06, .92); } 55% { transform: translateY(-26px) scale(.97, 1.04) rotate(4deg); } 85% { transform: scale(1.04, .96); } 100% { transform: none; } }
+@media (max-width: 560px) { .ls-say { left: calc(50% + 34px); top: 12%; font-size: 12px; } }
+@media (prefers-reduced-motion: reduce) { .ls-art img.ls-char.hop, .ls-say.pop { animation: none; } }
+
+.ql-win picture { display: block; cursor: zoom-in; }
+.ql-zoom { border: 0; padding: 0; background: #fff; border-radius: 10px; max-width: min(96vw, 1344px); width: 96vw; overflow: auto; cursor: zoom-out; }
+.ql-zoom::backdrop { background: rgba(8, 6, 20, .86); }
+.ql-zoom img { display: block; width: 100%; min-width: 760px; height: auto; }
+
+/* Last Stop: no frame, the wallpaper is the card */
+#laststop .card { padding: 0; background: #17111f; }
+#laststop .shot { border-radius: 9px; box-shadow: none; }
+.fw-tip { bottom: auto; top: 100%; margin: 4px 0 0; }
+@media (max-width: 560px) { .ls-say { top: 30%; left: calc(50% + 40px); max-width: 34%; } .fw-tip { font-size: 9.5px; padding: 3px 6px; } }

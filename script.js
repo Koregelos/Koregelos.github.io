@@ -584,3 +584,73 @@
     io.observe(card);
   }
 })();
+
+
+/* interactive round */
+(function () {
+  // forward charts: scrub to read values at any date
+  Array.prototype.forEach.call(document.querySelectorAll('.fw-plot[data-zero]'), function (plot) {
+    var zero = +plot.dataset.zero, k = +plot.dataset.k, t0 = +new Date(plot.dataset.t0), t1 = +new Date(plot.dataset.t1), gap = plot.dataset.mode === 'gap';
+    function pts(sel) { return plot.querySelector(sel).getAttribute('points').trim().split(/\s+/).map(function (p) { p = p.split(','); return [+p[0], +p[1]]; }); }
+    var me = pts('.fw-me'), bb = pts('.fw-btc');
+    function at(a, x) { for (var i = 1; i < a.length; i++) if (x <= a[i][0]) { var p = a[i - 1], q = a[i], f = q[0] === p[0] ? 0 : (x - p[0]) / (q[0] - p[0]); return p[1] + (q[1] - p[1]) * f; } return a[a.length - 1][1]; }
+    function mk(c, tag) { var e = document.createElement(tag || 'i'); e.className = c; plot.appendChild(e); return e; }
+    var line = mk('fw-x'), d1 = mk('fw-dot d-me'), d2 = mk('fw-dot d-b'), tip = mk('fw-tip', 'span'), hint = mk('fw-hint', 'span');
+    hint.textContent = matchMedia('(pointer: coarse)').matches ? 'Touch the chart' : 'Hover the chart';
+    var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    function pc(v) { var r = Math.round(v); return (r > 0 ? '+' : r < 0 ? '−' : '') + Math.abs(r) + '%'; }
+    function move(ev) {
+      var r = plot.getBoundingClientRect(), f = Math.max(0, Math.min(1, (ev.clientX - r.left) / r.width)), x = f * 480;
+      var ya = at(me, x), yb = at(bb, x), a = (zero - ya) * k, b = (zero - yb) * k, d = new Date(t0 + (t1 - t0) * f);
+      line.style.left = d1.style.left = d2.style.left = (f * 100) + '%';
+      d1.style.top = (ya / 120 * 100) + '%'; d2.style.top = (yb / 120 * 100) + '%';
+      var when = '<b>' + MON[d.getUTCMonth()] + ' ' + d.getUTCFullYear() + '</b>', g = Math.round(a - b);
+      tip.innerHTML = gap
+        ? when + (g === 0 ? 'level with ' + plot.dataset.b : '<span class="' + (g > 0 ? 'g' : 'r') + '">' + Math.abs(g) + ' points ' + (g > 0 ? 'ahead of ' : 'behind ') + plot.dataset.b + '</span>')
+        : when + '<span class="g">' + plot.dataset.a + ' ' + pc(a) + '</span> · <span class="r">' + plot.dataset.b + ' ' + pc(b) + '</span>';
+      var half = tip.offsetWidth / 2, px = f * r.width; tip.style.left = Math.max(half, Math.min(r.width - half, px)) + 'px';
+      plot.classList.add('scrub', 'used');
+    }
+    plot.addEventListener('pointermove', move); plot.addEventListener('pointerdown', move);
+    plot.addEventListener('pointerleave', function () { plot.classList.remove('scrub'); });
+    plot.addEventListener('pointercancel', function () { plot.classList.remove('scrub'); });
+  });
+
+  // business bars: pick a month
+  var chart = document.querySelector('.biz-chart'), key = document.querySelector('.biz-key');
+  if (chart && key) {
+    var keyHTML = key.innerHTML, cols = chart.querySelectorAll('.biz-col');
+    var pick = function (c) {
+      Array.prototype.forEach.call(cols, function (o) { o.classList.toggle('on', o === c); });
+      chart.classList.toggle('pick', !!c);
+      key.innerHTML = c ? '<span class="biz-read"><b>' + c.dataset.m + '</b>&nbsp; $' + c.dataset.r + ' in sales, <span class="g">$' + c.dataset.p + ' profit</span></span>' : keyHTML;
+    };
+    Array.prototype.forEach.call(cols, function (c) {
+      c.addEventListener('pointerenter', function () { pick(c); }); c.addEventListener('focus', function () { pick(c); }); c.addEventListener('click', function () { pick(c); });
+      c.addEventListener('blur', function () { pick(null); });
+    });
+    chart.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') pick(null); });
+  }
+
+  // Last Stop: poke the character
+  var poke = document.querySelector('.ls-poke'), say = document.querySelector('.ls-say'), ch = document.querySelector('.ls-char');
+  if (poke && say && ch) {
+    var lines = ['Hey.', 'Help me push the car.', 'Got any scrap?', 'It gets dark soon.', 'Honk honk.', 'I am fine. Everything is fine.', 'Was that a noise?', 'Ow.'], n = 0;
+    poke.addEventListener('click', function () {
+      say.textContent = lines[n++ % lines.length];
+      ch.classList.remove('hop'); say.classList.remove('pop'); void ch.offsetWidth; ch.classList.add('hop'); say.classList.add('pop');
+    });
+  }
+
+  // Quillton: click the screenshot to see it full size
+  var pic = document.querySelector('.ql-win picture');
+  if (pic && window.HTMLDialogElement) {
+    var dlg = document.createElement('dialog'); dlg.className = 'ql-zoom'; dlg.setAttribute('aria-label', 'Quillton screenshot, full size');
+    dlg.innerHTML = '<img src="img/quillton.jpg" alt="The Quillton app rewriting a stiff AI draft into natural writing">';
+    document.body.appendChild(dlg);
+    pic.setAttribute('role', 'button'); pic.setAttribute('tabindex', '0'); pic.setAttribute('aria-label', 'Enlarge the Quillton screenshot');
+    var open = function () { dlg.showModal(); };
+    pic.addEventListener('click', open); pic.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+    dlg.addEventListener('click', function () { dlg.close(); });
+  }
+})();
