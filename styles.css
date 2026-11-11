@@ -842,3 +842,19 @@ html.js .reveal:not(.seen) .fw-l { opacity: 0; }
 .pr-rev b { color: var(--ink); font-weight: 500; font-variant-numeric: tabular-nums; }
 #pr-best { margin-left: 8px; padding: 2px 7px; border-radius: 999px; background: rgba(139, 224, 164, .16); color: #8be0a4; opacity: 0; transition: opacity .25s ease; }
 #pr-best.on { opacity: 1; }
+
+/* Last Stop: drawn road through the three biomes */
+.ls-art svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.ls-art .ls-n { opacity: 0; animation: lsnight 12s ease-in-out infinite; }
+.ls-art .ls-dash { animation: lsroad 1.1s linear infinite; }
+.ls-art .ls-car { animation: lsbob 1.1s ease-in-out infinite; }
+@keyframes lsroad { to { transform: translateX(-92px); } }
+@keyframes lsbob { 50% { transform: translateY(-1.5px); } }
+html.js .reveal:not(.seen) .ls-art .ls-n, html.js .reveal:not(.seen) .ls-art .ls-dash, html.js .reveal:not(.seen) .ls-art .ls-car { animation-play-state: paused; }
+.ls-art::after { background: linear-gradient(180deg, rgba(15, 8, 28, .5) 0, rgba(15, 8, 28, 0) 20%, rgba(15, 8, 28, 0) 100%); }
+.ls-biomes { position: absolute; left: 0; right: 0; top: 46px; display: grid; grid-template-columns: repeat(3, 1fr); list-style: none; margin: 0; padding: 0; z-index: 1; font: 500 9.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: #fff; text-align: center; text-shadow: 0 1px 4px rgba(0, 0, 0, .6); }
+.shot-ls { min-height: 400px; }
+.shot-ls .ls-over { background: #17111f; padding-top: 14px; }
+.shot-ls .gm-name { font-size: clamp(28px, 7vw, 40px); }
+@media (prefers-reduced-motion: reduce) { .ls-art .ls-n, .ls-art .ls-dash, .ls-art .ls-car { animation: none; } }
+.shot-ls .ls-art { position: relative; inset: auto; flex: 1; min-height: 250px; }
