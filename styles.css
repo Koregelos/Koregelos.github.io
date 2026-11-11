@@ -1033,3 +1033,9 @@ html.js .reveal:not(.seen) .qd-tool { transform: translateY(18px) scale(.97); op
 @media (prefers-reduced-motion: reduce) { .pill.nudge { animation: none; } }
 .ql-chips { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0 0; padding: 0; }
 .ql-chips li { font: 500 10.5px var(--mono); letter-spacing: .04em; color: #3a2166; background: rgba(122, 74, 216, .12); border: 1px solid rgba(122, 74, 216, .28); border-radius: 99px; padding: 5px 10px; }
+
+/* Quillton card at the same height as the others */
+.shot-ql { gap: 10px; }
+.qd-tool .qd-sheet { font-size: 14.5px; line-height: 1.6; padding: 14px 16px 16px; }
+.ql-foot { margin: 6px 0 12px; }
+@media (max-width: 560px) { .qd-tool .qd-sheet { font-size: 13px; line-height: 1.55; padding: 12px 12px 12px; } .qd-tool .qd-tool-head { padding: 8px 12px; } .qd-tool .qd-tool-foot { padding: 8px 12px; } .ql-foot { margin: 2px 0 10px; } .shot-ql { padding-top: 40px; } }
