@@ -380,6 +380,11 @@
     requestAnimationFrame(glide);
   }
   window.addEventListener('scroll', pin, { passive: true });
+  // Trying to scroll during the intro points at the way out: the Skip pill grows and shakes
+  var nudgeT = 0;
+  function nudge() { if (done || !pill || pill.hidden || nudgeT) return; pill.classList.add('nudge'); nudgeT = setTimeout(function () { pill.classList.remove('nudge'); nudgeT = 0; }, 900); }
+  window.addEventListener('wheel', nudge, { passive: true }); window.addEventListener('touchmove', nudge, { passive: true });
+  window.addEventListener('keydown', function (e) { if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ' || e.key === 'End') nudge(); });
   window.addEventListener('load', pin); window.addEventListener('pageshow', pin);
   function later(fn, ms) { timer = setTimeout(fn, ms / speed); }
   var held = [document.querySelector('.nav'), document.getElementById('rail')].concat(Array.prototype.slice.call(document.querySelectorAll('.after')));
@@ -657,15 +662,6 @@
   }
 
   // Quillton: click the screenshot to see it full size
-  var see = document.querySelector('.ql-see');
-  if (see && window.HTMLDialogElement) {
-    var dlg = document.createElement('dialog'); dlg.className = 'ql-zoom'; dlg.setAttribute('aria-label', 'Quillton app screenshot');
-    var small = window.matchMedia && matchMedia('(max-width: 560px)').matches;
-    dlg.innerHTML = '<button type="button" class="ql-x" aria-label="Close">Close</button><img src="img/' + (small ? 'quillton-m.jpg' : 'quillton.jpg') + '" alt="The Quillton app rewriting a draft into natural writing, with four versions written at once">';
-    document.body.appendChild(dlg);
-    see.addEventListener('click', function () { dlg.showModal(); });
-    dlg.addEventListener('click', function () { dlg.close(); });
-  }
 })();
 
 /* Quillton card: the rewrite demo from the Quillton website */
@@ -690,7 +686,7 @@
     // (and, through requestAnimationFrame, while the tab is hidden).
     var held = false, hover = false, paused = false;
     var sync = function () { held = hover || paused; tool.classList.toggle("qd-paused", paused); };
-    tool.addEventListener("mouseenter", function () { hover = true; sync(); });
+    
     tool.addEventListener("mouseleave", function () { hover = false; sync(); });
     tool.setAttribute("tabindex", "0"); tool.setAttribute("role", "button"); tool.setAttribute("aria-label", "Quillton rewrite demo. Press to pause or resume.");
     tool.addEventListener("click", function () { paused = !paused; sync(); });
@@ -719,7 +715,7 @@
       tool.style.boxShadow = "0 1px 2px rgba(20, 24, 50, .04), 0 14px 48px -14px hsla(" + hue + ", " + Math.round(85 - 40 * f) + "%, 48%, " + (.22 - .06 * f).toFixed(2) + ")";
       meter.style.width = (f * 100) + "%";
       knob.style.left = (f * 100) + "%";
-      meterWord.textContent = f >= 1 ? "Reads human" : f >= .6 ? "Mostly human" : f > .2 ? "Getting there" : "Sounds like AI";
+      meterWord.textContent = f >= 1 ? "Reads natural" : f >= .6 ? "Mostly natural" : f > .2 ? "Getting there" : "Sounds stiff";
     };
     var setTally = function (s, done, total) {
       var now = words(live.textContent);
@@ -795,7 +791,7 @@
         live.textContent = s.after;
         setMeter(1);
         setTally(s, edits.length, edits.length);
-        setStatus("done", "Humanized");
+        setStatus("done", "Done");
         await wait(6000);
         return;
       }
@@ -832,7 +828,7 @@
         })(ed.span);
           await wait(260);
       }
-      setStatus("done", "Humanized");
+      setStatus("done", "Done");
 
       // Time to read the result before the next one.
       await wait(3600);

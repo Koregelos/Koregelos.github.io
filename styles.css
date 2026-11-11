@@ -1026,3 +1026,10 @@ html.js .reveal:not(.seen) .qd-tool { transform: translateY(18px) scale(.97); op
 @media (pointer: coarse) { .oly-open, .ql-see { min-height: 40px; padding-left: 14px; padding-right: 14px; } }
 .fw-plot .fw-hint { position: static; order: 1; margin-left: auto; align-self: center; }
 @media (max-width: 560px) { .fw-plot .fw-hint { display: none; } }
+
+/* the Skip pill answers a scroll attempt during the intro */
+.pill.nudge { animation: pillnudge .9s cubic-bezier(.3, 1.4, .5, 1); border-color: #ffc078; box-shadow: 0 0 0 3px rgba(255, 192, 120, .35), 0 10px 30px rgba(0, 0, 0, .5); }
+@keyframes pillnudge { 0% { transform: translateX(-50%) scale(1); } 18% { transform: translateX(-50%) scale(1.28); } 30% { transform: translateX(calc(-50% - 9px)) scale(1.28) rotate(-2deg); } 42% { transform: translateX(calc(-50% + 9px)) scale(1.28) rotate(2deg); } 54% { transform: translateX(calc(-50% - 6px)) scale(1.28) rotate(-1deg); } 66% { transform: translateX(calc(-50% + 6px)) scale(1.28); } 80% { transform: translateX(-50%) scale(1.28); } 100% { transform: translateX(-50%) scale(1); } }
+@media (prefers-reduced-motion: reduce) { .pill.nudge { animation: none; } }
+.ql-chips { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0 0; padding: 0; }
+.ql-chips li { font: 500 10.5px var(--mono); letter-spacing: .04em; color: #3a2166; background: rgba(122, 74, 216, .12); border: 1px solid rgba(122, 74, 216, .28); border-radius: 99px; padding: 5px 10px; }
