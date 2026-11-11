@@ -262,49 +262,61 @@
     card.addEventListener('pointerleave', function () { card.style.setProperty('--tx', '0deg'); card.style.setProperty('--ty', '0deg'); });
   });
 
-  /* ---------- Monte Carlo illustration inside the first project card ---------- */
+  /* ---------- Risk simulation on a strategy's real weekly backtest results ---------- */
   var canvas = document.getElementById('sim'), ctx = canvas.getContext('2d');
-  var N = 160, T = 200, paths = [], p5 = [], p50 = [], p95 = [], lo = 0, hi = 1, prog = 1, simRaf = 0;
+  var WK = [0.2289,-0.031,0.0138,0.2794,0.1011,-0.2973,-0.4088,0.5732,0.5785,1.0551,0.3524,0.3813,-0.2704,-0.013,0.202,-0.1401,-0.0755,-0.0527,0.3035,-0.2041,0.3261,0.0766,0.1214,0.2702,-0.065,0.0014,0.015,0.0434,0.0407,-0.0038,-0.023,0.0204,0.0177,-0.0331,0.0731,0.113,0.0822,0.1971,-0.1558,0.1676,-0.0985,0.0951,0.0625,-0.0448,-0.0221,-0.005,-0.1251,-0.0526,-0.1748,0.0912,0.1178,0.0221,0.0411,-0.0281,0.0544,0.0008,0.0229,-0.0029,0.0296,0.1138,0.0068,-0.0335,-0.0008,0.0482,0.0,0.0198,0.0212,-0.0445,0.198,-0.0385,0.0123,-0.1092,-0.1738,-0.0271,0.3962,-0.0038,-0.0446,0.0435,-0.0127,0.1072,0.0191,-0.0016,-0.0087,0.0093,-0.0689,0.0405,0.1202,0.122,-0.0298,0.0152,-0.0007,-0.0464,-0.0871,0.0162,0.14,-0.0871,0.0501,0.005,-0.0206,-0.0498,0.1427,-0.0035,-0.0224,-0.0041,0.0172,0.0325,0.0595,0.0401,-0.0254,-0.0334,-0.0341,0.1134,0.028,0.1403,-0.1326,0.0299,0.0355,0.0582,-0.004,0.0033,0.0107,-0.0111,0.0212,0.0394,0.1525,0.0123,0.1005,0.0075,0.0342,0.0021,0.015,0.025,-0.0104,-0.005,-0.0071,0.0042,-0.0047,0.006,-0.0046,0.003,0.0092,0.0221,-0.0022,0.0066,0.01,-0.0003,0.0025,-0.0052,0.0104,0.007,-0.0124,0.1147,0.4835,0.2206,-0.0918,-0.1008,0.0729,0.0142,0.0851,0.2223,-0.1304,0.0501,0.0255,0.1156,-0.0014,0.0028,-0.062,-0.0455,0.1336,0.0558,0.4459,-0.2603,-0.1186,0.1196,0.0302,0.2542,-0.0472,0.0731,-0.0233,0.0086,-0.0142,-0.0157,0.0995,-0.222,0.0798,0.0452,0.0445,0.0461,-0.0393];
+  var N = 200, T = WK.length, paths = [], p5 = [], p95 = [], real = [], lo = 0, hi = 1, prog = 1, simRaf = 0, stat = { win: N, dd: 0, bad: 0 };
+  var elWin = document.getElementById('mc-win'), elDd = document.getElementById('mc-dd'), elBad = document.getElementById('mc-bad');
+  (function () { var c = 0; real = [0]; for (var t = 0; t < T; t++) { c += WK[t]; real.push(c); } })();
   function simulate(seed) {
-    var r = rng(seed);
-    function normal() { var u = 0; while (u === 0) u = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(6.2832 * r()); }
-    paths = []; p5 = []; p50 = []; p95 = []; lo = Infinity; hi = -Infinity;
+    var r = rng(seed), dds = [], win = 0;
+    paths = []; p5 = []; p95 = []; lo = Infinity; hi = -Infinity;
     for (var i = 0; i < N; i++) {
-      var p = new Float64Array(T + 1); p[0] = 100;
-      for (var t = 1; t <= T; t++) p[t] = p[t - 1] * Math.exp(.0004 - .000072 + .012 * normal());
-      paths.push(p);
+      var p = new Float64Array(T + 1), pk = 0, dd = 0;
+      for (var t = 1; t <= T; t++) { p[t] = p[t - 1] + WK[(r() * T) | 0]; if (p[t] > pk) pk = p[t]; if (p[t] - pk < dd) dd = p[t] - pk; }
+      paths.push(p); dds.push(1 - Math.exp(dd)); if (p[T] > 0) win++;
     }
     for (var s = 0; s <= T; s++) {
       var col = paths.map(function (p) { return p[s]; }).sort(function (a, b) { return a - b; });
-      p5.push(col[Math.floor(N * .05)]); p50.push(col[Math.floor(N * .5)]); p95.push(col[Math.floor(N * .95)]);
-      lo = Math.min(lo, col[2]); hi = Math.max(hi, col[N - 3]);
+      p5.push(col[Math.floor(N * .05)]); p95.push(col[Math.floor(N * .95)]);
+      lo = Math.min(lo, col[2], real[s]); hi = Math.max(hi, col[N - 3], real[s]);
     }
+    dds.sort(function (a, b) { return a - b; });
+    stat = { win: win, dd: dds[Math.floor(N * .5)], bad: dds[Math.floor(N * .95)] };
+  }
+  function readout() {
+    if (!elWin) return;
+    elWin.textContent = Math.round(stat.win * prog) + ' of ' + N;
+    elDd.textContent = '−' + Math.round(stat.dd * 100 * prog) + '%';
+    elBad.textContent = '−' + Math.round(stat.bad * 100 * prog) + '%';
   }
   function drawSim() {
     var dpr = Math.min(window.devicePixelRatio || 1, 2), w = canvas.clientWidth, h = canvas.clientHeight;
     if (!w || !h) return;
     if (canvas.width !== Math.round(w * dpr)) { canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr); }
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
-    var L = 14, R = 14, B = 8, pw = w - L - R, ph = h - B - 6;
+    var L = 14, R = 14, B = 22, pw = w - L - R, ph = h - B - 6;
     function X(t) { return L + t / T * pw; }
     function Y(v) { return 6 + (1 - (v - lo) / (hi - lo)) * ph; }
     var end = Math.max(1, Math.round(prog * T)), i, t;
-    ctx.lineWidth = .7; ctx.strokeStyle = 'rgba(214,196,255,.17)';
+    ctx.strokeStyle = 'rgba(255,255,255,.22)'; ctx.lineWidth = 1; ctx.setLineDash([3, 4]); ctx.beginPath(); ctx.moveTo(L, Y(0)); ctx.lineTo(w - R, Y(0)); ctx.stroke(); ctx.setLineDash([]);
+    ctx.lineWidth = .7; ctx.strokeStyle = 'rgba(214,196,255,.15)';
     for (i = 0; i < N; i++) { ctx.beginPath(); ctx.moveTo(X(0), Y(paths[i][0])); for (t = 1; t <= end; t++) ctx.lineTo(X(t), Y(paths[i][t])); ctx.stroke(); }
     ctx.fillStyle = 'rgba(150,120,255,.20)'; ctx.beginPath(); ctx.moveTo(X(0), Y(p95[0]));
     for (t = 1; t <= end; t++) ctx.lineTo(X(t), Y(p95[t]));
     for (t = end; t >= 0; t--) ctx.lineTo(X(t), Y(p5[t]));
     ctx.fill();
-    ctx.strokeStyle = '#ffc078'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(X(0), Y(p50[0]));
-    for (t = 1; t <= end; t++) ctx.lineTo(X(t), Y(p50[t]));
+    ctx.strokeStyle = '#ffc078'; ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.beginPath(); ctx.moveTo(X(0), Y(real[0]));
+    for (t = 1; t <= end; t++) ctx.lineTo(X(t), Y(real[t]));
     ctx.stroke();
-    ctx.fillStyle = '#ffc078'; ctx.beginPath(); ctx.arc(X(end), Y(p50[end]), 3.2, 0, 6.2832); ctx.fill();
+    ctx.fillStyle = '#ffc078'; ctx.beginPath(); ctx.arc(X(end), Y(real[end]), 3.2, 0, 6.2832); ctx.fill();
+    readout();
   }
   function playSim() {
     cancelAnimationFrame(simRaf);
     if (reduce) { prog = 1; drawSim(); return; }
     var t0 = null; prog = 0;
-    (function f(ts) { if (t0 === null) t0 = ts; var k = Math.min(1, (ts - t0) / 2400); prog = 1 - Math.pow(1 - k, 3); drawSim(); if (k < 1) simRaf = requestAnimationFrame(f); })(performance.now());
+    (function f(ts) { if (t0 === null) t0 = ts; var k = Math.min(1, (ts - t0) / 2600); prog = 1 - Math.pow(1 - k, 3); drawSim(); if (k < 1) simRaf = requestAnimationFrame(f); })(performance.now());
   }
   simulate(4217); drawSim();
   if ('ResizeObserver' in window) new ResizeObserver(drawSim).observe(canvas);
@@ -461,18 +473,76 @@
   function armNav() { layRail(); ask(); }
 })();
 
-/* Project Olympus: switch between sheet tabs */
+/* Project Olympus: the real spreadsheet, rendered from olympus.js (names replaced, links and code removed) */
 (function () {
-  var tabs = document.querySelectorAll('.sh-tabs button');
-  Array.prototype.forEach.call(tabs, function (b) {
-    b.addEventListener('click', function () {
-      Array.prototype.forEach.call(tabs, function (o) {
-        var on = o === b;
-        o.classList.toggle('on', on);
-        o.setAttribute('aria-pressed', on ? 'true' : 'false');
-        var t = document.getElementById(o.getAttribute('data-view'));
-        if (t) t.hidden = !on;
-      });
-    });
-  });
+  var card = document.getElementById('olympus'), grid = document.getElementById('oly-grid'), tabs = document.getElementById('oly-tabs');
+  var oly = document.getElementById('oly'), dlg = document.getElementById('oly-dlg'), host = document.getElementById('oly-host');
+  if (!card || !grid) return;
+  var D = null, cur = 0, loading = false, panned = false, panRaf = 0, home = oly.parentNode;
+  function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  function letters(n) { var s = ''; n++; while (n > 0) { var m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = (n - m - 1) / 26; } return s; }
+  function build() {
+    var css = D.s.map(function (k, i) { var a = k.split('|'); return '.oly .s' + i + '{background:' + a[0] + ';color:' + a[1] + (a[2] === '1' ? ';font-weight:700' : '') + (a[3] === 'C' ? ';text-align:center' : a[3] === 'R' ? ';text-align:right' : '') + '}'; }).join('');
+    var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+    tabs.innerHTML = D.t.map(function (t, i) { return '<button type="button" data-i="' + i + '" aria-pressed="' + (i === cur) + '"' + (i === cur ? ' class="on"' : '') + '>' + esc(t.n) + '</button>'; }).join('');
+    render(cur);
+  }
+  function render(i) {
+    cur = i; var t = D.t[i], sum = 3, h = [];
+    for (var c = 0; c < t.w.length; c++) sum += t.w[c];
+    h.push('<table style="width:' + sum.toFixed(2) + 'em"><colgroup><col style="width:3em">');
+    for (c = 0; c < t.w.length; c++) h.push('<col style="width:' + t.w[c] + 'em">');
+    h.push('</colgroup><thead><tr><th></th>');
+    for (c = 0; c < t.w.length; c++) h.push('<th>' + letters(c) + '</th>');
+    h.push('</tr></thead><tbody>');
+    for (var r = 0; r < t.r.length; r++) {
+      var row = t.r[r], mine = false, cells = '';
+      for (c = 0; c < row.length; c++) {
+        var v = row[c];
+        if (v === -1) continue;
+        if (typeof v === 'number') { cells += '<td class="s' + v + '"></td>'; continue; }
+        if (c < 3 && v[0].indexOf('(my strategy)') > 0) mine = true;
+        cells += '<td class="s' + v[1] + '"' + (v[2] > 1 ? ' colspan="' + v[2] + '"' : '') + (v[3] > 1 ? ' rowspan="' + v[3] + '"' : '') + '>' + esc(v[0]) + '</td>';
+      }
+      h.push('<tr' + (mine ? ' class="me"' : '') + '><th>' + (r + 1) + '</th>' + cells + '</tr>');
+    }
+    h.push('</tbody></table>');
+    grid.innerHTML = h.join(''); grid.scrollLeft = 0; grid.scrollTop = 0;
+    Array.prototype.forEach.call(tabs.children, function (b, k) { b.classList.toggle('on', k === i); b.setAttribute('aria-pressed', k === i); });
+  }
+  function load() {
+    if (D || loading) return; loading = true;
+    var sc = document.createElement('script'); sc.src = 'olympus.js';
+    sc.onload = function () { D = window.OLY; if (D) { build(); pan(); } };
+    sc.onerror = function () { grid.innerHTML = '<p class="oly-load">The spreadsheet preview could not load.</p>'; };
+    document.head.appendChild(sc);
+  }
+  function stopPan() { cancelAnimationFrame(panRaf); panned = true; }
+  function pan() {
+    if (panned || !D || !card.classList.contains('seen')) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) { panned = true; return; }
+    panned = true; var t0 = null, max = Math.min(520, grid.scrollWidth - grid.clientWidth);
+    (function f(ts) {
+      if (t0 === null) t0 = ts; var k = (ts - t0) / 7000;
+      if (k >= 1) { grid.scrollLeft = 0; return; }
+      var e = k < .5 ? k * 2 : (1 - k) * 2; e = e * e * (3 - 2 * e);
+      grid.scrollLeft = max * e; panRaf = requestAnimationFrame(f);
+    })(performance.now() + 900);
+  }
+  ['pointerdown', 'wheel', 'touchstart', 'keydown'].forEach(function (ev) { grid.addEventListener(ev, function () { cancelAnimationFrame(panRaf); }, { passive: true }); });
+  tabs.addEventListener('click', function (e) { var b = e.target.closest('button'); if (b && D) { cancelAnimationFrame(panRaf); render(+b.getAttribute('data-i')); } });
+  ['copy', 'cut', 'contextmenu', 'dragstart'].forEach(function (ev) { oly.addEventListener(ev, function (e) { e.preventDefault(); }); });
+  var open = document.getElementById('oly-open'), x = document.getElementById('oly-x');
+  if (open && dlg && dlg.showModal) {
+    open.addEventListener('click', function () { cancelAnimationFrame(panRaf); load(); host.appendChild(oly); dlg.showModal(); });
+    dlg.addEventListener('close', function () { home.appendChild(oly); grid.scrollTop = 0; });
+    dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
+    x.addEventListener('click', function () { dlg.close(); });
+  } else if (open) open.hidden = true;
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { load(); io.disconnect(); } }, { rootMargin: '900px 0px' });
+    io.observe(card);
+    var io2 = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { setTimeout(pan, 300); io2.disconnect(); } }, { threshold: .5 });
+    io2.observe(grid);
+  } else load();
 })();
