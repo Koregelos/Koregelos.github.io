@@ -507,7 +507,7 @@
       h.push('<tr' + (mine ? ' class="me"' : '') + '><th>' + (r + 1) + '</th>' + cells + '</tr>');
     }
     h.push('</tbody></table>');
-    grid.innerHTML = h.join(''); grid.scrollLeft = 0; grid.scrollTop = 0;
+    grid.innerHTML = h.join(''); grid.setAttribute('data-k', t.k || 0); grid.scrollLeft = 0; grid.scrollTop = 0;
     Array.prototype.forEach.call(tabs.children, function (b, k) { b.classList.toggle('on', k === i); b.setAttribute('aria-pressed', k === i); });
   }
   function load() {

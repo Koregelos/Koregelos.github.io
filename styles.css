@@ -800,3 +800,10 @@ html.js .reveal:not(.seen) .wt-dots i { opacity: .15; transform: scale(.6); }
   .ql-win img { width: 190%; max-width: none; margin-left: -45%; }
   .wt-bar i { font-size: 9px; padding: 0 3px; }
 }
+
+/* critic round 3 */
+.shot-oly .oly-grid[data-k="1"] tbody tr:nth-child(-n+1), .shot-oly .oly-grid[data-k="3"] tbody tr:nth-child(-n+3) { display: none; }
+.hold-key span i + i { margin-left: -3px; }
+.wt-bar i { padding: 0 4px; font-size: 9.5px; letter-spacing: -.02em; }
+.wt-bar i:last-child { flex-basis: 34px; flex-shrink: 0; }
+@media (max-width: 560px) { .ql-win img { width: 100%; margin-left: 0; } }
