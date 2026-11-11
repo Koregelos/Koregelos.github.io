@@ -17,6 +17,7 @@
   var land = document.getElementById('land');
   (function buildLand() {
     var r = rng(916), svg = '';
+    window.__fg = { spans: [], Y: null }; var fgSpans = window.__fg.spans, fgY = null;
     var defs = [
       // base y, height, peakiness (1 = jagged mountains, 0 = rolling hills), top color, bottom color, pines, pine size
       { base: 520, amp: 175, peak: 1, c1: '#d9a0b4', c2: '#c98aa8', pines: 0 },
@@ -33,6 +34,7 @@
         var soft = .5 + .32 * Math.sin(x * f1 * 1.3 + p1) + .14 * Math.sin(x * f2 + p2) + .04 * Math.sin(x * f3 + p3);
         return d.base - d.amp * (d.peak * Math.pow(jag, 1.35) + (1 - d.peak) * soft);
       }
+      if (i === 5) fgY = Y;
       var pts = [];
       for (var x = -120; x <= 1720; x += 10) pts.push(x + ' ' + Y(x).toFixed(1));
       var g = '<linearGradient id="lg' + i + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + d.c1 + '"/><stop offset="1" stop-color="' + d.c2 + '"/></linearGradient>';
@@ -44,6 +46,7 @@
         var px = i === 5 ? (r() < .5 ? -60 + r() * 380 : 1280 + r() * 380) : -100 + r() * 1800;
         var h = d.size * (.7 + r() * .7), w = h * .3, py = Y(px) + 3, tree = '';
         for (var s = 0; s < 4; s++) { var top = py - h + s * h * .2, ww = w * (.45 + s * .2); tree += 'M' + px.toFixed(1) + ' ' + top.toFixed(1) + ' l' + ww.toFixed(1) + ' ' + (h * .38).toFixed(1) + ' h-' + (ww * 2).toFixed(1) + 'z '; }
+        if (i === 5) fgSpans.push([px - w * 1.15, px + w * 1.15]);
         body += '<path fill="' + d.c2 + '" d="' + tree + 'M' + (px - w * .1).toFixed(1) + ' ' + (py - 4).toFixed(1) + ' h' + (w * .2).toFixed(1) + ' v8 h-' + (w * .2).toFixed(1) + 'z"/>';
       }
       if (i === 4) { // a cabin on the near shore, its window lit
@@ -62,6 +65,7 @@
       }
       svg += '<defs>' + g + '</defs>' + mist + water + '<g data-depth="' + (i + 1) + '">' + body + '</g>';
     });
+    window.__fg.Y = fgY;
     land.innerHTML = '<defs><radialGradient id="winglow"><stop offset="0" stop-color="#ffc66b" stop-opacity=".55"/><stop offset="1" stop-color="#ffc66b" stop-opacity="0"/></radialGradient><linearGradient id="lake" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a5e9c" stop-opacity="0"/><stop offset=".22" stop-color="#6a5092"/><stop offset=".5" stop-color="#4a3b7a"/><stop offset="1" stop-color="#2b2556"/></linearGradient><radialGradient id="ref"><stop offset="0" stop-color="#fff3d0" stop-opacity=".95"/><stop offset=".5" stop-color="#ffc98f" stop-opacity=".5"/><stop offset="1" stop-color="#ffc98f" stop-opacity="0"/></radialGradient><linearGradient id="mist" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd9c2" stop-opacity="0"/><stop offset=".5" stop-color="#ffd9c2" stop-opacity=".55"/><stop offset="1" stop-color="#ffd9c2" stop-opacity="0"/></linearGradient></defs>' + svg;
   })();
 
@@ -104,11 +108,21 @@
   var scene = document.querySelector('.scene'), sunEl = document.querySelector('.sun'), lakefx = document.getElementById('lakefx'), sunref = document.getElementById('sunref'), fogband = document.getElementById('fogband');
   var wasScrolled = false, maxScroll = 1, lastT = -1, lastClock = '', isNight = false;
   /* Lake light lives in plain layers above the drawing, so the drawing itself never has to repaint */
-  (function () {
-    if (!lakefx) return; var r = rng(77), o = '';
-    for (var q = 0; q < 16; q++) o += '<i style="left:' + (r() < .5 ? r() * 24 : 72 + r() * 24).toFixed(1) + '%;top:' + (r() * 92).toFixed(1) + '%;width:' + (14 + r() * 40).toFixed(0) + 'px;animation-delay:-' + (r() * 4).toFixed(1) + 's"></i>';
-    lakefx.innerHTML = o;
+  var glints = [];
+  (function () { // only on open water: never across a foreground tree or the near hill
+    if (!lakefx) return; var r = rng(77), fg = window.__fg || { spans: [], Y: null }, tries = 0;
+    while (glints.length < 16 && tries++ < 900) {
+      var len = 14 + r() * 36, x = -100 + r() * 1800 - len / 2, y = 825 + r() * 62, ok = true;
+      for (var s = 0; s < fg.spans.length; s++) if (x + len > fg.spans[s][0] - 6 && x < fg.spans[s][1] + 6) { ok = false; break; }
+      if (ok && fg.Y) for (var xx = x; xx <= x + len; xx += 6) if (fg.Y(xx) - 5 < y) { ok = false; break; }
+      if (ok) glints.push([x, y, len, r() * 4]);
+    }
   })();
+  function layGlints(w, scale) {
+    if (!lakefx) return; var o = '';
+    for (var q = 0; q < glints.length; q++) { var g = glints[q]; o += '<i style="left:' + (w / 2 + (g[0] - 800) * scale).toFixed(1) + 'px;top:' + ((g[1] - 822) * scale).toFixed(1) + 'px;width:' + (g[2] * scale).toFixed(0) + 'px;animation-delay:-' + g[3].toFixed(1) + 's"></i>'; }
+    lakefx.innerHTML = o;
+  }
   var parts = {};
   function fade(sel, o, tf) { // set one layer's opacity (and position) directly; hidden layers cost nothing
     var el = parts[sel] || (parts[sel] = scene.querySelector(sel)); if (!el) return;
@@ -120,7 +134,7 @@
     var w = window.innerWidth, h = window.innerHeight, scale = Math.max(w / 1600, h / 900);
     function Y(y) { return h - (900 - y) * scale; }
     maxScroll = Math.max(1, document.documentElement.scrollHeight - h); lastT = -1;
-    if (lakefx) { lakefx.style.top = Y(822) + 'px'; lakefx.style.height = (70 * scale) + 'px'; }
+    if (lakefx) { lakefx.style.top = Y(822) + 'px'; lakefx.style.height = (70 * scale) + 'px'; } layGlints(w, scale);
     if (fogband) { fogband.style.top = Y(760) + 'px'; fogband.style.height = (110 * scale) + 'px'; }
     var sx = parseFloat(getComputedStyle(sunEl).left);
     if (sunref && !isNaN(sx)) { sunref.style.left = sx + 'px'; sunref.style.top = Y(800) + 'px'; sunref.style.height = (100 * scale) + 'px'; sunref.style.width = (34 * scale) + 'px'; }
@@ -287,8 +301,6 @@
   function readout() {
     if (!elWin) return;
     elWin.textContent = Math.round(stat.win * prog) + ' of ' + N;
-    elDd.textContent = '−' + Math.round(stat.dd * 100 * prog) + '%';
-    elBad.textContent = '−' + Math.round(stat.bad * 100 * prog) + '%';
   }
   function drawSim() {
     var dpr = Math.min(window.devicePixelRatio || 1, 2), w = canvas.clientWidth, h = canvas.clientHeight;

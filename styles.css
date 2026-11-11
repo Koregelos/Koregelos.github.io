@@ -858,3 +858,13 @@ html.js .reveal:not(.seen) .ls-art .ls-n, html.js .reveal:not(.seen) .ls-art .ls
 .shot-ls .gm-name { font-size: clamp(28px, 7vw, 40px); }
 @media (prefers-reduced-motion: reduce) { .ls-art .ls-n, .ls-art .ls-dash, .ls-art .ls-car { animation: none; } }
 .shot-ls .ls-art { position: relative; inset: auto; flex: 1; min-height: 250px; }
+
+/* Last Stop cover: the player character in front of the scene */
+.ls-char { position: absolute; right: 16%; bottom: 3%; height: 82%; width: auto; filter: drop-shadow(0 6px 5px rgba(10, 6, 20, .45)); transform-origin: 50% 100%; animation: lsidle 3.2s ease-in-out infinite; }
+@keyframes lsidle { 50% { transform: translateY(-3px) rotate(-1deg); } }
+html.js .reveal:not(.seen) .ls-char { animation-play-state: paused; }
+.shot-ls .ls-art { min-height: 270px; }
+@media (max-width: 560px) { .ls-char { right: 10%; } }
+@media (prefers-reduced-motion: reduce) { .ls-char { animation: none; } }
+.ls-art img.ls-char { inset: auto 16% 3% auto; width: auto; height: 82%; object-fit: contain; }
+@media (max-width: 560px) { .ls-art img.ls-char { right: 10%; } }
