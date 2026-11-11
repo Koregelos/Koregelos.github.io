@@ -426,10 +426,10 @@
       var box = t.el.getBoundingClientRect(); var isScript = t.el.classList.contains('script'); penTo(t.el, isScript ? 1.1 : t.para ? .5 : .26);
       var line = window.innerHeight * .6;
       if (box.bottom > line) { goalY = Math.max(goalY, (window.scrollY || 0) + box.bottom - line); if (!gliding) { gliding = true; requestAnimationFrame(glide); } }
-      var hold = isScript ? 1050 : t.ico ? 70 : t.rich ? 370 : 148;
-      if (/[.!?]$/.test(t.text)) hold += 420; else if (/,$/.test(t.text)) hold += 170;
+      var hold = isScript ? 900 : t.ico ? 60 : t.rich ? 300 : 128;
+      if (/[.!?]$/.test(t.text)) hold += 360; else if (/,$/.test(t.text)) hold += 140;
       later(step, hold);
-    }, t.para && idx > 1 ? 700 : 0);
+    }, t.para && idx > 1 ? 560 : 0);
   }
   function startIntro() {
     replayPending = false; done = false; lockY = 0; goalY = 0; gliding = false; jump(0); root.classList.add('ready'); setInert(true); setTimeout(pin, 300); setTimeout(pin, 1200);
@@ -606,7 +606,7 @@
       d1.style.top = (ya / 120 * 100) + '%'; d2.style.top = (yb / 120 * 100) + '%';
       var when = '<b>' + MON[d.getUTCMonth()] + ' ' + d.getUTCFullYear() + '</b>', g = Math.round(a - b);
       tip.innerHTML = gap
-        ? when + (g === 0 ? 'level with ' + plot.dataset.b : '<span class="' + (g > 0 ? 'g' : 'r') + '">' + Math.abs(g) + ' points ' + (g > 0 ? 'ahead of ' : 'behind ') + plot.dataset.b + '</span>')
+        ? when + (g === 0 ? 'level with ' + plot.dataset.b : '<span class="' + (g > 0 ? 'g' : 'r') + '">' + Math.abs(g) + '% ' + (g > 0 ? 'ahead of ' : 'behind ') + plot.dataset.b + '</span>')
         : when + '<span class="g">' + plot.dataset.a + ' ' + pc(a) + '</span> · <span class="r">' + plot.dataset.b + ' ' + pc(b) + '</span>';
       var half = tip.offsetWidth / 2, px = f * r.width; tip.style.left = Math.max(half, Math.min(r.width - half, px)) + 'px';
       plot.classList.add('scrub', 'used');
