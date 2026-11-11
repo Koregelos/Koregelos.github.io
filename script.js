@@ -280,15 +280,15 @@
   var canvas = document.getElementById('sim'), ctx = canvas.getContext('2d');
   var WK = [0.2289,-0.031,0.0138,0.2794,0.1011,-0.2973,-0.4088,0.5732,0.5785,1.0551,0.3524,0.3813,-0.2704,-0.013,0.202,-0.1401,-0.0755,-0.0527,0.3035,-0.2041,0.3261,0.0766,0.1214,0.2702,-0.065,0.0014,0.015,0.0434,0.0407,-0.0038,-0.023,0.0204,0.0177,-0.0331,0.0731,0.113,0.0822,0.1971,-0.1558,0.1676,-0.0985,0.0951,0.0625,-0.0448,-0.0221,-0.005,-0.1251,-0.0526,-0.1748,0.0912,0.1178,0.0221,0.0411,-0.0281,0.0544,0.0008,0.0229,-0.0029,0.0296,0.1138,0.0068,-0.0335,-0.0008,0.0482,0.0,0.0198,0.0212,-0.0445,0.198,-0.0385,0.0123,-0.1092,-0.1738,-0.0271,0.3962,-0.0038,-0.0446,0.0435,-0.0127,0.1072,0.0191,-0.0016,-0.0087,0.0093,-0.0689,0.0405,0.1202,0.122,-0.0298,0.0152,-0.0007,-0.0464,-0.0871,0.0162,0.14,-0.0871,0.0501,0.005,-0.0206,-0.0498,0.1427,-0.0035,-0.0224,-0.0041,0.0172,0.0325,0.0595,0.0401,-0.0254,-0.0334,-0.0341,0.1134,0.028,0.1403,-0.1326,0.0299,0.0355,0.0582,-0.004,0.0033,0.0107,-0.0111,0.0212,0.0394,0.1525,0.0123,0.1005,0.0075,0.0342,0.0021,0.015,0.025,-0.0104,-0.005,-0.0071,0.0042,-0.0047,0.006,-0.0046,0.003,0.0092,0.0221,-0.0022,0.0066,0.01,-0.0003,0.0025,-0.0052,0.0104,0.007,-0.0124,0.1147,0.4835,0.2206,-0.0918,-0.1008,0.0729,0.0142,0.0851,0.2223,-0.1304,0.0501,0.0255,0.1156,-0.0014,0.0028,-0.062,-0.0455,0.1336,0.0558,0.4459,-0.2603,-0.1186,0.1196,0.0302,0.2542,-0.0472,0.0731,-0.0233,0.0086,-0.0142,-0.0157,0.0995,-0.222,0.0798,0.0452,0.0445,0.0461,-0.0393];
   var N = 200, T = WK.length, paths = [], p5 = [], p95 = [], real = [], lo = 0, hi = 1, prog = 1, simRaf = 0, stat = { win: N, dd: 0, bad: 0 };
-  var elWin = document.getElementById('mc-win'), elDd = document.getElementById('mc-dd'), elBad = document.getElementById('mc-bad');
+  var elWin = document.getElementById('mc-win'), elBeat = document.getElementById('mc-beat');
   (function () { var c = 0; real = [0]; for (var t = 0; t < T; t++) { c += WK[t]; real.push(c); } })();
   function simulate(seed) {
-    var r = rng(seed), dds = [], win = 0;
+    var r = rng(seed), dds = [], win = 0, beat = 0;
     paths = []; p5 = []; p95 = []; lo = Infinity; hi = -Infinity;
     for (var i = 0; i < N; i++) {
       var p = new Float64Array(T + 1), pk = 0, dd = 0;
       for (var t = 1; t <= T; t++) { p[t] = p[t - 1] + WK[(r() * T) | 0]; if (p[t] > pk) pk = p[t]; if (p[t] - pk < dd) dd = p[t] - pk; }
-      paths.push(p); dds.push(1 - Math.exp(dd)); if (p[T] > 0) win++;
+      paths.push(p); dds.push(1 - Math.exp(dd)); if (p[T] > 0) win++; if (p[T] > real[T]) beat++;
     }
     for (var s = 0; s <= T; s++) {
       var col = paths.map(function (p) { return p[s]; }).sort(function (a, b) { return a - b; });
@@ -296,11 +296,12 @@
       lo = Math.min(lo, col[2], real[s]); hi = Math.max(hi, col[N - 3], real[s]);
     }
     dds.sort(function (a, b) { return a - b; });
-    stat = { win: win, dd: dds[Math.floor(N * .5)], bad: dds[Math.floor(N * .95)] };
+    stat = { win: win, beat: beat };
   }
   function readout() {
     if (!elWin) return;
     elWin.textContent = Math.round(stat.win * prog) + ' of ' + N;
+    if (elBeat) elBeat.textContent = Math.round(stat.beat * prog) + ' of ' + N;
   }
   function drawSim() {
     var dpr = Math.min(window.devicePixelRatio || 1, 2), w = canvas.clientWidth, h = canvas.clientHeight;
@@ -339,7 +340,7 @@
   }
   (function () {
     function again() { simulate((Math.random() * 1e9) | 0); playSim(); }
-    document.getElementById('trading').querySelector('.card').addEventListener('click', again);
+    document.getElementById('rerun').addEventListener('click', again);
   })();
 
   /* ---------- The intro: sign the name, then write the story one word at a time ---------- */
@@ -418,6 +419,7 @@
   }
   function step() {
     if (done) return;
+    if (reduce) { finish(); return; }
     if (idx >= tokens.length) { penAway(); later(finish, 1100); return; }
     var t = tokens[idx++];
     later(function () {
@@ -490,7 +492,7 @@
   var card = document.getElementById('olympus'), grid = document.getElementById('oly-grid'), tabs = document.getElementById('oly-tabs');
   var oly = document.getElementById('oly'), dlg = document.getElementById('oly-dlg'), host = document.getElementById('oly-host');
   if (!card || !grid) return;
-  var D = null, cur = 0, loading = false, panned = false, panRaf = 0, home = oly.parentNode;
+  var D = null, cur = 3, loading = false, panned = false, panRaf = 0, home = oly.parentNode;
   function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
   function letters(n) { var s = ''; n++; while (n > 0) { var m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = (n - m - 1) / 26; } return s; }
   function build() {
@@ -516,10 +518,11 @@
         if (c < 3 && v[0].indexOf('(my strategy)') > 0) mine = true;
         cells += '<td class="s' + v[1] + '"' + (v[2] > 1 ? ' colspan="' + v[2] + '"' : '') + (v[3] > 1 ? ' rowspan="' + v[3] + '"' : '') + '>' + esc(v[0]) + '</td>';
       }
-      h.push('<tr' + (mine ? ' class="me"' : '') + '><th>' + (r + 1) + '</th>' + cells + '</tr>');
+      h.push('<tr' + (mine ? ' class="me"' : i === 3 && (r === 1 || r === 2) ? ' class="hd hd' + r + '"' : '') + '><th>' + (r + 1) + '</th>' + cells + '</tr>');
     }
     h.push('</tbody></table>');
     grid.innerHTML = h.join(''); grid.setAttribute('data-k', t.k || 0); grid.scrollLeft = 0; grid.scrollTop = 0;
+    var me = grid.querySelector('tr.me'); if (me && !oly.closest('dialog')) grid.scrollTop = Math.max(0, me.offsetTop - grid.clientHeight * .55);
     Array.prototype.forEach.call(tabs.children, function (b, k) { b.classList.toggle('on', k === i); b.setAttribute('aria-pressed', k === i); });
   }
   function load() {
@@ -547,7 +550,7 @@
   var open = document.getElementById('oly-open'), x = document.getElementById('oly-x');
   if (open && dlg && dlg.showModal) {
     open.addEventListener('click', function () { cancelAnimationFrame(panRaf); load(); host.appendChild(oly); dlg.showModal(); });
-    dlg.addEventListener('close', function () { home.appendChild(oly); grid.scrollTop = 0; });
+    dlg.addEventListener('close', function () { home.appendChild(oly); render(cur); });
     dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
     x.addEventListener('click', function () { dlg.close(); });
   } else if (open) open.hidden = true;
@@ -599,21 +602,32 @@
     hint.textContent = matchMedia('(pointer: coarse)').matches ? 'Touch the chart' : 'Hover the chart';
     var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     function pc(v) { var r = Math.round(v); return (r > 0 ? '+' : r < 0 ? '−' : '') + Math.abs(r) + '%'; }
+    var svg = plot.querySelector('svg');
     function move(ev) {
-      var r = plot.getBoundingClientRect(), f = Math.max(0, Math.min(1, (ev.clientX - r.left) / r.width)), x = f * 480;
+      var pr = plot.getBoundingClientRect(), r = svg.getBoundingClientRect(), f = Math.max(0, Math.min(1, (ev.clientX - r.left) / r.width)), x = f * 480;
       var ya = at(me, x), yb = at(bb, x), a = (zero - ya) * k, b = (zero - yb) * k, d = new Date(t0 + (t1 - t0) * f);
-      line.style.left = d1.style.left = d2.style.left = (f * 100) + '%';
-      d1.style.top = (ya / 120 * 100) + '%'; d2.style.top = (yb / 120 * 100) + '%';
+      var top = r.top - pr.top, px = r.left - pr.left + f * r.width;
+      line.style.left = d1.style.left = d2.style.left = px + 'px';
+      line.style.top = (top - 4) + 'px'; line.style.height = (r.height + 8) + 'px';
+      d1.style.top = (top + ya / 120 * r.height) + 'px'; d2.style.top = (top + yb / 120 * r.height) + 'px';
       var when = '<b>' + MON[d.getUTCMonth()] + ' ' + d.getUTCFullYear() + '</b>', g = Math.round(a - b);
       tip.innerHTML = gap
         ? when + (g === 0 ? 'level with ' + plot.dataset.b : '<span class="' + (g > 0 ? 'g' : 'r') + '">' + Math.abs(g) + '% ' + (g > 0 ? 'ahead of ' : 'behind ') + plot.dataset.b + '</span>')
-        : when + '<span class="g">' + plot.dataset.a + ' ' + pc(a) + '</span> · <span class="r">' + plot.dataset.b + ' ' + pc(b) + '</span>';
-      var half = tip.offsetWidth / 2, px = f * r.width; tip.style.left = Math.max(half, Math.min(r.width - half, px)) + 'px';
+        : when + '<span class="g">' + plot.dataset.a + ' ' + pc(a) + '</span> \u00b7 <span class="r">' + plot.dataset.b + ' ' + pc(b) + '</span>';
+      var half = tip.offsetWidth / 2; tip.style.left = Math.max(half, Math.min(pr.width - half, px)) + 'px';
       plot.classList.add('scrub', 'used');
     }
-    plot.addEventListener('pointermove', move); plot.addEventListener('pointerdown', move);
-    plot.addEventListener('pointerleave', function () { plot.classList.remove('scrub'); });
-    plot.addEventListener('pointercancel', function () { plot.classList.remove('scrub'); });
+    var off = function () { plot.classList.remove('scrub'); };
+    svg.addEventListener('pointermove', move); svg.addEventListener('pointerdown', move);
+    svg.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') off(); });
+    document.addEventListener('pointerdown', function (e) { if (!plot.contains(e.target)) off(); });
+    plot.setAttribute('tabindex', '0');
+    var kf = .5;
+    plot.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return; e.preventDefault();
+      kf = Math.max(0, Math.min(1, kf + (e.key === 'ArrowRight' ? .04 : -.04))); var r = svg.getBoundingClientRect(); move({ clientX: r.left + kf * r.width });
+    });
+    plot.addEventListener('blur', off);
   });
 
   // business bars: pick a month
@@ -623,7 +637,7 @@
     var pick = function (c) {
       Array.prototype.forEach.call(cols, function (o) { o.classList.toggle('on', o === c); });
       chart.classList.toggle('pick', !!c);
-      key.innerHTML = c ? '<span class="biz-read"><b>' + c.dataset.m + '</b>&nbsp; $' + c.dataset.r + ' in sales, <span class="g">$' + c.dataset.p + ' profit</span></span>' : keyHTML;
+      key.innerHTML = c ? '<span class="biz-read"><b>' + c.dataset.m + '</b>&nbsp; $' + c.dataset.r + ' in revenue, <span class="g">$' + c.dataset.p + ' profit</span></span>' : keyHTML;
     };
     Array.prototype.forEach.call(cols, function (c) {
       c.addEventListener('pointerenter', function () { pick(c); }); c.addEventListener('focus', function () { pick(c); }); c.addEventListener('click', function () { pick(c); });
@@ -646,7 +660,8 @@
   var see = document.querySelector('.ql-see');
   if (see && window.HTMLDialogElement) {
     var dlg = document.createElement('dialog'); dlg.className = 'ql-zoom'; dlg.setAttribute('aria-label', 'Quillton app screenshot');
-    dlg.innerHTML = '<img src="img/quillton.jpg" alt="The Quillton app rewriting a stiff AI draft into natural writing, with four versions written at once" loading="lazy">';
+    var small = window.matchMedia && matchMedia('(max-width: 560px)').matches;
+    dlg.innerHTML = '<button type="button" class="ql-x" aria-label="Close">Close</button><img src="img/' + (small ? 'quillton-m.jpg' : 'quillton.jpg') + '" alt="The Quillton app rewriting a draft into natural writing, with four versions written at once">';
     document.body.appendChild(dlg);
     see.addEventListener('click', function () { dlg.showModal(); });
     dlg.addEventListener('click', function () { dlg.close(); });
@@ -673,9 +688,13 @@
 
     // One clock for every step, which stands still while the pointer rests on the box
     // (and, through requestAnimationFrame, while the tab is hidden).
-    var held = false;
-    tool.addEventListener("mouseenter", function () { held = true; });
-    tool.addEventListener("mouseleave", function () { held = false; });
+    var held = false, hover = false, paused = false;
+    var sync = function () { held = hover || paused; tool.classList.toggle("qd-paused", paused); };
+    tool.addEventListener("mouseenter", function () { hover = true; sync(); });
+    tool.addEventListener("mouseleave", function () { hover = false; sync(); });
+    tool.setAttribute("tabindex", "0"); tool.setAttribute("role", "button"); tool.setAttribute("aria-label", "Quillton rewrite demo. Press to pause or resume.");
+    tool.addEventListener("click", function () { paused = !paused; sync(); });
+    tool.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); paused = !paused; sync(); } });
     var wait = function (ms, onFrame) {
       return new Promise(function (done) {
         var spent = 0;

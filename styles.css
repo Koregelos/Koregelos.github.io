@@ -1003,3 +1003,26 @@ html.js .reveal:not(.seen) .qd-tool { transform: translateY(18px) scale(.97); op
 
 .ql-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 10px 0 14px; font-size: 11.5px; color: #6b5a80; }
 .ql-see { white-space: nowrap; }
+
+/* review round: fixes from the full audit */
+.fw-plot { display: flex; flex-wrap: wrap; gap: 4px 14px; cursor: default; outline: none; }
+.fw-plot svg { order: 2; flex: 0 0 100%; cursor: crosshair; touch-action: pan-y; }
+.fw-plot .fw-l { position: static; order: 1; background: none; padding: 0; display: inline-flex; align-items: center; gap: 6px; font-size: 11px; }
+.fw-plot .fw-l::before { content: ""; width: 14px; height: 2.5px; border-radius: 2px; background: currentColor; }
+.fw-plot.scrub .fw-l { opacity: 1 !important; }
+.fw-plot:focus-visible svg { outline: 2px solid rgba(255, 255, 255, .7); outline-offset: 4px; }
+.fw-x { bottom: auto; }
+.fw-hint { left: auto; right: 0; top: 0; bottom: auto; }
+.oly-grid tr.me td { box-shadow: inset 0 2px 0 #111, inset 0 -2px 0 #111, inset 0 0 0 99px rgba(255, 221, 51, .42); }
+.oly-grid tr.hd td { position: sticky; z-index: 1; }
+.oly-grid tr.hd1 td { top: 1.75em; } .oly-grid tr.hd2 td { top: 3.5em; }
+.oly-tabs { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 34px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 34px), transparent); padding-right: 30px; }
+.shot-ls .shot-tag { color: #3d2600; text-shadow: none; }
+.ql-x { position: sticky; top: 8px; float: right; margin: 8px 8px -40px 0; z-index: 2; font: 500 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: #fff; background: #17111f; border: 0; border-radius: 99px; padding: 8px 14px; cursor: pointer; }
+.qd-tool { cursor: pointer; }
+.qd-tool.qd-paused .qd-status::after { content: "paused"; margin-left: 8px; font-weight: 500; color: var(--ink-3); }
+.qd-tool:focus-visible { outline: 2px solid #7a4ad8; outline-offset: 3px; }
+@media (max-width: 560px) { .block { scroll-margin-top: 16px; } .ql-zoom img { min-width: 0; } .biz-col em { font-size: 9px; } }
+@media (pointer: coarse) { .oly-open, .ql-see { min-height: 40px; padding-left: 14px; padding-right: 14px; } }
+.fw-plot .fw-hint { position: static; order: 1; margin-left: auto; align-self: center; }
+@media (max-width: 560px) { .fw-plot .fw-hint { display: none; } }

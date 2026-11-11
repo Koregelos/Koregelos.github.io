@@ -1,18 +1,17 @@
 # Christian Koregelos, portfolio site
 
-A static site with no build step. Three files do all the work:
+A static site with no build step.
 
 - `index.html` holds the content
-- `styles.css` holds the design (colors and fonts are set at the top)
-- `script.js` runs the theme toggle and the Monte Carlo chart
+- `styles.css` holds the design
+- `script.js` runs the intro, the scenery, and every interactive card
+- `olympus.js` holds the data for the Project Olympus spreadsheet viewer
+- `img/` holds the images
 
 ## Preview on your computer
 
 Open `index.html` in a browser.
 
-## Host it free on GitHub Pages
+## Hosting
 
-1. Create a public repository on GitHub named `<your-username>.github.io`.
-2. Upload `index.html`, `styles.css`, and `script.js` to the repository root.
-3. Open the repository's Settings, then Pages, and set the source to the `main` branch.
-4. Your site will be live at `https://<your-username>.github.io` within a few minutes.
+The site is served by GitHub Pages from the `main` branch of `Koregelos/Koregelos.github.io`. Upload every file and the `img/` folder to the repository root; the page needs all of them.
