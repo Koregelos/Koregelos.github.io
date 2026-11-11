@@ -597,3 +597,40 @@ html.js .reveal:not(.seen) .curve polyline { stroke-dashoffset: 1; }
 html.nojs .sh-tabs button[data-view="sh-str"] { display: none; }
 .shot-quill .flow { margin-top: auto; }
 .shot-quill .pitch { margin-bottom: 0; }
+
+/* ---------- critic round fixes ---------- */
+.shot-tag { right: 16px; font-size: 10.5px; color: rgba(255, 255, 255, .72); }
+.shot-tag.dark { color: rgba(40, 20, 60, .75); }
+.shot-sheet .shot-tag.dark { color: #5d5a50; }
+.shot-sim .shot-tag, .shot-game .shot-tag { right: 96px; }
+.legend { color: rgba(255, 255, 255, .8); }
+.ax { position: absolute; font: 500 10px var(--mono); color: rgba(255, 255, 255, .6); z-index: 1; pointer-events: none; }
+.ax-s { left: 16px; top: 50%; margin-top: 18px; }
+.ax-t { right: 16px; bottom: 30px; }
+.hold-key em { flex-basis: 100%; margin-left: 0; color: rgba(255, 255, 255, .65); }
+.sh-t th:nth-child(2) { width: 38%; }
+.sh-tabs span { color: #5d5a50; }
+.checks { display: grid; grid-template-columns: repeat(3, 1fr); }
+.checks li { font-size: 11px; }
+.gm-loop li + li::before { content: none; }
+.gm-loop li:not(:last-child)::after { content: "\2192"; margin: 0 8px; color: rgba(255, 255, 255, .6); }
+.shot-quill .flow { margin-top: 12px; }
+.shot-quill .meter { margin-top: auto; }
+.meter-row b { font-size: 26px; }
+.meter-track { height: 10px; }
+.flow li { font-size: 11.5px; }
+.shot-ledger .pitch { margin-bottom: 0; }
+.shot-ledger .growth { margin-top: auto; }
+@media (max-width: 560px) {
+  .shot-ledger { padding-top: 44px; }
+  .shot-ledger dl { margin-top: auto; }
+  .sh-t th:nth-child(2) { width: 46%; font-size: 10.5px; }
+  .sh-t th, .sh-t td { padding: 0 4px; }
+  .checks { grid-template-columns: 1fr; }
+  .tiles dt { font-size: 11px; }
+  .shot-robust .tiles { grid-template-columns: 1fr 1fr; }
+  .shot-robust .tiles .bad { grid-column: 1 / -1; }
+  .gm-loop li:not(:last-child)::after { margin: 0 5px; }
+  .ax-t { bottom: 46px; }
+  .meter-row b { font-size: 21px; }
+}
